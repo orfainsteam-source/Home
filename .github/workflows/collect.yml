@@ -1,0 +1,52 @@
+# هر ۳۰ دقیقه، و هر بار که چیزی در مخزن عوض شود (مثلاً علاقه‌مندی‌ها)، خبرها را جمع می‌کند و سایت را منتشر می‌کند.
+name: Collect news
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+      - name: Collect
+        env:
+          SITE_URL: https://orfainsteam-source.github.io/Home
+        run: |
+          mkdir -p _site
+          node scripts/collect.mjs
+          cp index.html .nojekyll _site/ 2>/dev/null || cp index.html _site/
+          mkdir -p _site/config && cp -r config/. _site/config/ 2>/dev/null || true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

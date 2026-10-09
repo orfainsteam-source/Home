@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#F4F2FF; --surface:#FFFFFF; --ink:#1F1A3D; --muted:#655F8C; --line:#E0DCF3;
-  --glass:rgb(255 255 255 / .84); --game:#0B8C94; --anime:#D2306F; --tech:#6A4FD0; --other:#A86A10;
+  --glass:rgb(255 255 255 / .84); --game:#0B8C94; --anime:#D2306F; --tech:#6A4FD0; --other:#A86A10; --animation:#D9661A;
   --display:"Lalezar","Vazirmatn",Tahoma,sans-serif;
   --body:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
   box-sizing:border-box;
@@ -21,12 +21,12 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
-    --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B;
+    --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A;
   }
 }
 :root[data-theme="dark"]{
   --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
-  --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B;
+  --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -39,6 +39,10 @@ button,input,select{font:inherit;color:inherit}
 /* themed backgrounds */
 .scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .scene>div{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}
+.scene>.backdrop{inset:-80px;background:center/cover no-repeat;filter:blur(56px) saturate(1.25);transform:scale(1.04);transition:opacity 1s ease}
+.scene>.backdrop.on{opacity:.3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .scene>.backdrop.on{opacity:.42}}
+:root[data-theme="dark"] .scene>.backdrop.on{opacity:.42}
 body[data-tab="game"] .s-game,body[data-tab="anime"] .s-anime{opacity:1}
 body[data-tab="all"] .s-game,body[data-tab="all"] .s-anime{opacity:.7}
 .s-game{background:radial-gradient(120% 55% at 50% 100%,color-mix(in srgb,var(--game) 24%,transparent),transparent 70%)}
@@ -77,6 +81,8 @@ h1 .mark{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-
 .icon-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);
   padding:9px 14px;border-radius:999px;cursor:pointer;font-weight:500}
 .icon-btn:hover{border-color:var(--muted)}
+.icon-btn.round{width:44px;height:44px;padding:0;justify-content:center;background:var(--glass)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .icon-btn svg{width:18px;height:18px}
 .icon-btn.busy svg{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(-360deg)}}
@@ -107,6 +113,12 @@ h1 .mark{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-
 .lead.card{display:grid}
 .thumb{aspect-ratio:16/9;background:var(--line);overflow:hidden}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb.ph{display:grid;place-items:center;color:#fff;
+  background:radial-gradient(120% 90% at 85% 10%,color-mix(in srgb,var(--c) 85%,#fff) 0,transparent 55%),
+             linear-gradient(135deg,color-mix(in srgb,var(--c) 75%,#120f2a),color-mix(in srgb,var(--c) 35%,#120f2a))}
+.thumb.ph span{font-family:var(--display);font-size:clamp(1.3rem,3vw,2rem);padding:14px;text-align:center;direction:ltr;opacity:.92}
+.card .thumb,.card h2{cursor:pointer}
+.card h2:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
 .lead .thumb{aspect-ratio:auto;min-height:260px}
 .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
 .meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:.85rem;color:var(--muted)}
@@ -122,6 +134,35 @@ h1 .mark{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-
 .links a:hover,.links button:hover{text-decoration:underline}
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty .btn{margin-top:14px}
+
+/* reader */
+dialog.reader{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0;padding:0;
+  background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
+dialog.reader::backdrop{background:var(--bg)}
+.r-bg{position:fixed;inset:-80px;background:center/cover no-repeat;filter:blur(60px) saturate(1.3);opacity:.4;pointer-events:none}
+.r-in{position:relative;max-width:720px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(90px + env(safe-area-inset-bottom,0px))}
+.r-top{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0}
+.r-meta{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:.9rem;margin:8px 0 6px}
+.r-meta .src{color:var(--c);font-weight:700}
+.r-in h2{font-family:var(--display);font-weight:400;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.35;margin:0 0 18px}
+.r-hero{width:100%;border-radius:14px;margin:0 0 22px;display:block;max-height:440px;object-fit:cover;box-shadow:0 18px 40px rgb(10 8 30 / .25)}
+.r-body{font-size:1.07rem;line-height:2.05}
+.r-body p,.r-body li,.r-body blockquote{margin:0 0 1.1em}
+.r-body h3{font-size:1.2rem;margin:1.6em 0 .6em;line-height:1.6}
+.r-body blockquote{border-inline-start:4px solid var(--c);padding-inline-start:14px;color:var(--muted)}
+.r-body li{list-style:disc;margin-inline-start:1.2em}
+.r-body figure{margin:1.4em 0}
+.r-body figure img{width:100%;border-radius:10px;display:block}
+.r-body figcaption{color:var(--muted);font-size:.85rem;margin-top:6px}
+.r-body [dir="ltr"]{font-family:system-ui,sans-serif;font-size:.98rem}
+.r-body .pending{opacity:.5}
+.r-body .o{display:block;direction:ltr;text-align:left;color:var(--muted);font-family:system-ui,sans-serif;font-size:.88rem;line-height:1.7;margin-top:4px}
+.r-body .o[hidden]{display:none}
+.r-note{color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:10px 0 20px}
+.r-foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.r-foot a.btn{text-decoration:none;display:inline-block}
+.gh-state{font-size:.85rem;margin-top:6px}
+.gh-state.ok{color:var(--game)} .gh-state.bad{color:var(--anime)}
 
 /* favourites */
 .fav-toggle[aria-pressed="true"]{background:var(--other);border-color:var(--other);color:var(--bg)}
@@ -202,6 +243,7 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
 </head>
 <body data-tab="all">
 <div class="scene" aria-hidden="true">
+  <div class="backdrop" id="backdrop"></div>
   <div class="s-game"><div class="sun"></div><div class="floor"></div><div class="scan"></div></div>
   <div class="s-anime"><div class="speed"></div><div class="dots"></div></div>
 </div>
@@ -212,13 +254,13 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <div class="today" id="today"></div>
     </div>
     <div class="actions">
-      <button class="icon-btn" id="refreshBtn" type="button">
+      <button class="icon-btn round" id="refreshBtn" type="button" title="به‌روزرسانی">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
-        به‌روزرسانی
+        <span class="sr">به‌روزرسانی</span>
       </button>
-      <button class="icon-btn" id="settingsBtn" type="button" aria-label="تنظیمات">
+      <button class="icon-btn round" id="settingsBtn" type="button" title="تنظیمات">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
-        تنظیمات
+        <span class="sr">تنظیمات</span>
       </button>
     </div>
   </header>
@@ -256,6 +298,14 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <p class="hint">اسم را تایپ کن و از پیشنهادها مورد درست را انتخاب کن. اسم رسمی و اسم‌های دیگرش خودکار ثبت می‌شوند. پیشنهاد بازی‌ها از Wikidata و انیمه‌ها از AniList می‌آید. اگر چیزی پیدا نشد، می‌توانی همان متن را دستی اضافه کنی. اسم‌های دیگر را با کاما جدا کن، مثلاً <span class="ltr" dir="ltr">GTA 6, GTA VI</span>. برای هر کدام، آخرین خبرهای یک ماه اخیر از کل اینترنت (Google News و Bing News) جمع می‌شود. بخشی که خالی بماند، همه‌ی خبرهای منابعش نشان داده می‌شود.</p>
     <div id="favEdit"></div>
 
+    <h4>ذخیره در GitHub</h4>
+    <p class="hint">با این توکن، علاقه‌مندی‌ها و منابع در مخزن ذخیره می‌شوند تا جمع‌کننده‌ی خودکار، خبرهایشان را از کل اینترنت بیاورد. توکن فقط در همین مرورگر می‌ماند.</p>
+    <div class="field">
+      <label for="ghToken">توکن GitHub</label>
+      <input id="ghToken" class="ltr" type="password" autocomplete="off" placeholder="github_pat_...">
+      <div class="gh-state" id="ghState"></div>
+    </div>
+
     <h4>ترجمه</h4>
     <div class="radio">
       <label><input type="radio" name="engine" value="google"> گوگل (رایگان، بدون کلید)</label>
@@ -288,6 +338,24 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
   </div>
 </dialog>
 
+<dialog id="reader" class="reader" aria-label="خواندن خبر">
+  <div class="r-bg" id="rBg"></div>
+  <div class="r-in">
+    <div class="r-top">
+      <button class="icon-btn round" id="rClose" type="button" title="بستن">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <span class="sr">بستن</span>
+      </button>
+      <button class="icon-btn" id="rOrig" type="button">نمایش متن اصلی</button>
+    </div>
+    <div class="r-meta" id="rMeta"></div>
+    <h2 id="rTitle"></h2>
+    <img class="r-hero" id="rHero" alt="" referrerpolicy="no-referrer">
+    <div class="r-body" id="rBody"></div>
+    <div class="r-foot" id="rFoot"></div>
+  </div>
+</dialog>
+
 <script>
 (() => {
 "use strict";
@@ -296,6 +364,7 @@ const CATS = {
   game:  {label:"گیم",      color:"var(--game)"},
   anime: {label:"انیمه",    color:"var(--anime)"},
   tech:  {label:"تکنولوژی", color:"var(--tech)"},
+  animation: {label:"انیمیشن", color:"var(--animation)"},
   other: {label:"سایر",     color:"var(--other)"}
 };
 
@@ -307,13 +376,14 @@ const DEFAULT_FEEDS = [
   {name:"Eurogamer",         url:"https://www.eurogamer.net/feed",                             cat:"game",  on:false},
   {name:"Anime News Network",url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:true},
   {name:"MyAnimeList",       url:"https://myanimelist.net/rss/news.xml",                       cat:"anime", on:true},
-  {name:"Anime Corner",      url:"https://animecorner.me/feed/",                               cat:"anime", on:true}
+  {name:"Anime Corner",      url:"https://animecorner.me/feed/",                               cat:"anime", on:true},
+  {name:"Cartoon Brew",      url:"https://www.cartoonbrew.com/feed",                           cat:"animation", on:true}
 ];
 
 const DEFAULTS = {feeds:DEFAULT_FEEDS, engine:"google", geminiKey:"", geminiModel:"gemini-3.5-flash", theme:"auto", favs:{}, favOnly:true};
-const STALE_MS = 20*60*1000;
+
 // کلمه‌ای که کنار اسم علاقه‌مندی در جست‌وجو می‌آید تا نتیجه‌های بی‌ربط (مثلاً One Piece در معنای دیگر) کم شود
-const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], tech:["tech"], other:[]};
+const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], animation:["animated","series","season"], tech:["tech"], other:[]};
 const SEARCH_DAYS = 30, PER_SEARCH = 15;
 function searchSources(fav, cat){
   const quoted = fav.terms.map(t => '"' + t.replace(/"/g, "") + '"');
@@ -365,6 +435,12 @@ async function pickAnime(m, typed){
     const b = r.results.bindings[0];
     if (b && /^tt\d+$/.test(b.imdb.value)) imdb = "https://www.imdb.com/title/" + b.imdb.value + "/";
   } catch {}
+  if (!imdb){   // پشتیبان: TVmaze شناسه‌ی IMDb خیلی از انیمه‌ها را دارد
+    try {
+      const t = JSON.parse(await fetchText("https://api.tvmaze.com/singlesearch/shows?q=" + encodeURIComponent(m.title.english || m.title.romaji), {}, 8000));
+      if (t && t.externals && /^tt\d+$/.test(t.externals.imdb || "")) imdb = "https://www.imdb.com/title/" + t.externals.imdb + "/";
+    } catch {}
+  }
   return {name, terms, src:"anilist", id:m.id, img: safeUrl(m.coverImage && m.coverImage.medium),
           page: safeUrl(m.siteUrl), imdb: imdb || imdbSearch(short.length >= 4 ? short : name), imdbExact: !!imdb};
 }
@@ -391,9 +467,21 @@ async function pickWikidata(id, label, typed){
   return {name, terms: buildTerms(name, aliases, typed), src:"wikidata", id,
           page:"https://www.wikidata.org/wiki/" + id, imdb, imdbExact: !!imdb};
 }
-const suggestFor = (cat, q) => cat === "anime" ? suggestAnime(q) : suggestWikidata(q, cat);
+async function suggestTV(q){
+  const d = JSON.parse(await fetchText("https://api.tvmaze.com/search/shows?q=" + encodeURIComponent(q), {}, 10000));
+  let list = d.map(x => x.show);
+  const anim = list.filter(x => x.type === "Animation");
+  if (anim.length) list = [...anim, ...list.filter(x => x.type !== "Animation")];
+  return list.slice(0, 8).map(x => ({name:x.name,
+    sub:[x.premiered && x.premiered.slice(0, 4), (x.network || x.webChannel || {}).name, x.type].filter(Boolean).join(" | "),
+    img: safeUrl(x.image && x.image.medium), pick: async () => ({name:x.name, terms: buildTerms(x.name, [], q), src:"tvmaze", id:x.id,
+      img: safeUrl(x.image && x.image.medium), page: safeUrl(x.url),
+      imdb: x.externals && x.externals.imdb ? "https://www.imdb.com/title/" + x.externals.imdb + "/" : imdbSearch(x.name),
+      imdbExact: !!(x.externals && x.externals.imdb)})}));
+}
+const suggestFor = (cat, q) => cat === "anime" ? suggestAnime(q) : cat === "animation" ? suggestTV(q) : suggestWikidata(q, cat);
 
-const FAV_HINT = {game:"Dota 2, Elden Ring…", anime:"One Piece, Frieren…", tech:"Steam Deck…", other:"Keyword…"};
+const FAV_HINT = {game:"Dota 2, Elden Ring…", anime:"One Piece, Frieren…", animation:"Rick and Morty, Arcane…", tech:"Steam Deck…", other:"Keyword…"};
 
 /* ---------- storage ---------- */
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -418,7 +506,7 @@ const perFeed = () => hasFavs() ? 40 : 12;
 const maxItems = () => hasFavs() ? 240 : 90;
 let favMemo = new Map();
 function favOf(item){
-  if (item.fav) return item.fav;
+  if (item.fav) return favsOf(item.cat).some(f => f.name === item.fav) ? item.fav : "";
   if (favMemo.has(item.id)) return favMemo.get(item.id);
   const text = norm(item.title + " " + item.summary);
   let hit = "";
@@ -567,7 +655,79 @@ async function pool(tasks, n){
   return out;
 }
 
-async function refresh(){
+/* ---------- GitHub: shared data and settings ---------- */
+const GH = (() => {
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+  const repo = location.pathname.split("/").filter(Boolean)[0];
+  return m && repo ? {owner:m[1], repo} : {owner:"orfainsteam-source", repo:"Home"};
+})();
+async function ghApi(path, opts = {}){
+  const r = await fetch("https://api.github.com/repos/" + GH.owner + "/" + GH.repo + path, {...opts,
+    headers:{Authorization:"Bearer " + settings.ghToken, Accept:"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28"}});
+  if (!r.ok){ const e = new Error("HTTP " + r.status); e.status = r.status; throw e; }
+  return r.status === 204 ? null : r.json();
+}
+function b64(str){ const b = new TextEncoder().encode(str); let s = ""; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
+async function pushConfig(){
+  const body = JSON.stringify({updated: settings.cfgUpdated || Date.now(), feeds: settings.feeds, favs: settings.favs || {}}, null, 2) + "\n";
+  let sha;
+  try { sha = (await ghApi("/contents/config/config.json?ref=main")).sha; } catch(e){ if (e.status !== 404) throw e; }
+  await ghApi("/contents/config/config.json", {method:"PUT", body: JSON.stringify({message:"Update favourites", content:b64(body), sha, branch:"main"})});
+}
+async function requestCollect(){
+  await ghApi("/actions/workflows/collect.yml/dispatches", {method:"POST", body: JSON.stringify({ref:"main"})});
+}
+const ghErr = e => e.status === 401 ? "توکن نامعتبر یا منقضی است" : e.status === 403 || e.status === 404 ? "توکن اجازه‌ی کافی ندارد" : "اتصال به GitHub برقرار نشد";
+// نسخه‌ی مخزن از تنظیمات، اگر جدیدتر از نسخه‌ی این مرورگر باشد، جایگزین می‌شود
+async function loadRemoteConfig(){
+  try {
+    const c = JSON.parse(await fetchText("config/config.json?t=" + Date.now(), {cache:"no-store"}, 8000));
+    if ((c.updated || 0) > (settings.cfgUpdated || 0)){
+      if (c.favs) settings.favs = c.favs;
+      if (c.feeds && c.feeds.length) settings.feeds = c.feeds;
+      settings.cfgUpdated = c.updated; favMemo = new Map(); save("hn:settings", settings);
+      return true;
+    }
+  } catch {}
+  return false;
+}
+const isStale = () => Date.now() - (cache.fetched || cache.ts || 0) > 10*60*1000;
+let watchTimer = 0;
+// منتظر می‌ماند تا جمع‌کننده نسخه‌ی جدید را منتشر کند
+function watchForUpdate(sinceTs, note){
+  clearInterval(watchTimer);
+  const start = Date.now();
+  setStatus(note);
+  watchTimer = setInterval(async () => {
+    if (Date.now() - start > 12*60*1000){ clearInterval(watchTimer); setStatus(); return; }
+    try {
+      const d = JSON.parse(await fetchText("data/news.json?t=" + Date.now(), {cache:"no-store"}, 15000));
+      if (d.ts > sinceTs){ clearInterval(watchTimer); await loadRemoteConfig(); applyData(d); }
+    } catch {}
+  }, 30000);
+}
+function applyData(d){
+  cache = {ts:d.ts, items:d.items, failed:d.failed || [], fetched:Date.now(), remote:true};
+  favMemo = new Map(); save("hn:items", cache);
+  renderTabs(); render(); translateAll();
+}
+
+async function refresh(manual){
+  if (busy) return;
+  busy = true; $("refreshBtn").classList.add("busy");
+  setStatus("در حال گرفتن خبرها…");
+  let d = null;
+  try { d = JSON.parse(await fetchText("data/news.json?t=" + Date.now(), {cache:"no-store"}, 15000)); if (!d || !d.items) d = null; } catch {}
+  busy = false; $("refreshBtn").classList.remove("busy");
+  if (!d) return refreshDirect();
+  applyData(d);
+  // با دکمه‌ی به‌روزرسانی، اگر داده‌ها کهنه‌اند و توکن داریم، یک جمع‌آوری تازه درخواست کن
+  if (manual && settings.ghToken && Date.now() - d.ts > 8*60*1000){
+    try { await requestCollect(); watchForUpdate(d.ts, "جمع‌آوری تازه شروع شد. چند دقیقه‌ی دیگر خبرها خودکار عوض می‌شوند."); } catch {}
+  }
+}
+
+async function refreshDirect(){
   if (busy) return;
   busy = true; $("refreshBtn").classList.add("busy");
   setStatus("در حال گرفتن خبرها…");
@@ -596,7 +756,7 @@ async function refresh(){
     const reg = regular.sort((a, b) => b.ts - a.ts).slice(0, maxItems());
     const merged = [...reg, ...found].filter(x => { const k = key(x); if (seen.has(k) || seen.has(x.id)) return false; seen.add(k); seen.add(x.id); return true; })
                                     .sort((a, b) => b.ts - a.ts);
-    cache = {ts: Date.now(), items: merged, failed};
+    cache = {ts: Date.now(), items: merged, failed, fetched: Date.now()};
     favMemo = new Map();
     save("hn:items", cache);
   } else {
@@ -695,18 +855,23 @@ function fillCard(item, parts){
 function makeCard(item, lead){
   const card = el("article", "card " + item.cat + (lead ? " lead" : ""));
   card.style.setProperty("--c", (CATS[item.cat] || CATS.other).color);
+  const th = el("div", "thumb");
+  const ph = () => { th.textContent = ""; th.classList.add("ph"); th.append(el("span", "", item.src)); };
   if (item.img){
-    const th = el("div", "thumb"), im = el("img");
+    const im = el("img");
     im.src = item.img; im.alt = ""; im.loading = lead ? "eager" : "lazy"; im.referrerPolicy = "no-referrer";
-    im.onerror = () => th.remove();
-    th.append(im); card.append(th);
-  }
+    im.onerror = ph;
+    th.append(im);
+  } else ph();
+  th.onclick = () => openReader(item);
+  card.append(th);
   const body = el("div", "body");
   const meta = el("div", "meta");
   meta.append(el("span", "src", item.src), el("span", "", ago(item.ts)));
   const fv = favsOf(item.cat).length ? favOf(item) : "";
   if (fv) meta.append(el("span", "fav", "★ " + fv));
   const h = el("h2"), p = el("p");
+  h.onclick = () => openReader(item);
   const orig = el("div", "orig"); orig.hidden = true;
   orig.append(el("strong", "", item.title));
   if (item.summary) orig.append(el("div", "", item.summary));
@@ -714,8 +879,11 @@ function makeCard(item, lead){
   const tog = el("button", "", "متن اصلی"); tog.type = "button";
   tog.onclick = () => { orig.hidden = !orig.hidden; tog.textContent = orig.hidden ? "متن اصلی" : "بستن متن اصلی"; };
   links.append(tog);
+  const rd = el("button", "", item.full ? "خواندن کامل" : "خواندن"); rd.type = "button";
+  rd.onclick = () => openReader(item);
+  links.append(rd);
   if (item.link){
-    const a = el("a", "", "خواندن خبر"); a.href = item.link; a.target = "_blank"; a.rel = "noopener noreferrer";
+    const a = el("a", "", "منبع"); a.href = item.link; a.target = "_blank"; a.rel = "noopener noreferrer";
     links.append(a);
   }
   body.append(meta, h, p, orig, links);
@@ -766,8 +934,24 @@ function paintFavInfo(){
   const links = el("div", "links");
   const link = (href, label) => { const a = el("a", "", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; links.append(a); };
   if (f.imdb) link(f.imdb, f.imdbExact ? "صفحه‌ی IMDb" : "جست‌وجو در IMDb");
-  if (f.page) link(f.page, f.src === "anilist" ? "AniList" : "Wikidata");
+  if (f.page) link(f.page, {anilist:"AniList", tvmaze:"TVmaze"}[f.src] || "Wikidata");
   tx.append(links); box.append(tx);
+}
+
+let bdUrl = "";
+function setBackdrop(url){
+  const b = $("backdrop");
+  if (!url){ b.classList.remove("on"); bdUrl = ""; return; }
+  if (url === bdUrl) return;
+  bdUrl = url;
+  const im = new Image(); im.referrerPolicy = "no-referrer";
+  im.onload = () => { if (bdUrl !== url) return; b.style.backgroundImage = "url(" + JSON.stringify(url) + ")"; b.classList.add("on"); };
+  im.src = url;
+}
+function favPickImg(){
+  if (!favPick) return "";
+  const [cat, ...rest] = favPick.split(":"); const f = favsOf(cat).find(x => x.name === rest.join(":"));
+  return f && f.img ? f.img.replace("/small/", "/large/") : "";
 }
 
 function render(){
@@ -790,6 +974,7 @@ function render(){
     setStatus();
     return;
   }
+  setBackdrop(favPickImg() || (list.find(x => x.img) || {}).img);
   feed.append(makeCard(list[0], true));
   const grid = el("div", "grid");
   list.slice(1).forEach(x => grid.append(makeCard(x, false)));
@@ -806,12 +991,92 @@ function setStatus(msg, trFails = 0){
   const s = $("status"); s.textContent = "";
   if (msg){ s.textContent = msg; return; }
   const parts = [];
-  if (cache.ts) parts.push(["", "آخرین به‌روزرسانی " + ago(cache.ts)]);
+  if (cache.ts) parts.push(["", "آخرین جمع‌آوری " + ago(cache.ts)]);
   if (translating) parts.push(["", "در حال ترجمه…"]);
   if (cache.failed && cache.failed.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + cache.failed.join("، ")]);
   if (trFails) parts.push(["warn", "ترجمه‌ی " + trFails.toLocaleString("fa-IR") + " خبر انجام نشد"]);
   parts.forEach(([c, t], i) => { if (i) s.append("، "); s.append(el("span", c, t)); });
 }
+
+/* ---------- reader ---------- */
+let readerSeq = 0, artTr = load("hn:art", {});
+async function gTranslate(text){
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=fa&dt=t&q=" + encodeURIComponent(text);
+  const data = JSON.parse(await fetchText(url, {}, 15000));
+  return data[0].map(x => x[0]).join("").trim();
+}
+function saveArtTr(id){
+  const keys = Object.keys(artTr);
+  if (keys.length > 12) for (const k of keys.slice(0, keys.length - 12)) if (k !== id) delete artTr[k];
+  save("hn:art", artTr);
+}
+async function openReader(item){
+  const my = ++readerSeq, dlg = $("reader");
+  dlg.style.setProperty("--c", (CATS[item.cat] || CATS.other).color);
+  $("rBg").style.backgroundImage = item.img ? "url(" + JSON.stringify(item.img) + ")" : "none";
+  const meta = $("rMeta"); meta.textContent = "";
+  meta.append(el("span", "src", item.src), el("span", "", ago(item.ts)));
+  const fv = favOf(item); if (fv) meta.append(el("span", "", "★ " + fv));
+  const t = tr[item.id];
+  $("rTitle").textContent = t ? t.t : item.title; $("rTitle").dir = t ? "rtl" : "ltr";
+  const hero = $("rHero"); hero.hidden = !item.img; if (item.img) hero.src = item.img;
+  hero.onerror = () => { hero.hidden = true; };
+  const body = $("rBody"); body.textContent = "";
+  const foot = $("rFoot"); foot.textContent = "";
+  if (item.link){ const a = el("a", "btn", "باز کردن در سایت " + item.src); a.href = item.link; a.target = "_blank"; a.rel = "noopener noreferrer"; foot.append(a); }
+  $("rOrig").setAttribute("aria-pressed", "false"); $("rOrig").textContent = "نمایش متن اصلی";
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  if (!t) translateAll();
+
+  let blocks = null;
+  if (item.full && cache.remote){
+    body.append(el("p", "pending", "در حال آوردن متن کامل…"));
+    try { blocks = JSON.parse(await fetchText("data/a/" + item.id + ".json", {}, 15000)).blocks; } catch {}
+    if (my !== readerSeq) return;
+    body.textContent = "";
+  }
+  if (!blocks || !blocks.length){
+    blocks = item.summary ? [{t:"p", x:item.summary}] : [];
+    const n = el("div", "r-note", "متن کامل این خبر در دسترس نیست" + (item.summary ? "؛ این خلاصه‌ی آن است." : ".") + " برای خواندن همه‌اش، خبر را در سایت اصلی باز کن.");
+    body.append(n);
+  }
+  // عکس اول متن معمولاً همان عکس بالای صفحه است
+  if (blocks[0] && blocks[0].t === "img" && item.img) blocks = blocks.slice(1);
+  const saved = artTr[item.id] || {}, jobs = [];
+  for (const [i, b] of blocks.entries()){
+    if (b.t === "img"){
+      const f = el("figure"), im = el("img"); im.src = b.s; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+      im.onerror = () => f.remove(); f.append(im);
+      if (b.x) f.append(el("figcaption", "", b.x));
+      body.append(f); continue;
+    }
+    const node = el(b.t === "h" ? "h3" : b.t === "q" ? "blockquote" : b.t === "li" ? "li" : "p");
+    const main = el("span"), orig = el("span", "o", b.x); orig.hidden = true;
+    const fill = fa => { main.textContent = fa; main.dir = "rtl"; node.classList.remove("pending"); };
+    if (saved[i]) fill(saved[i]);
+    else { main.textContent = b.x; main.dir = "ltr"; node.classList.add("pending"); jobs.push([i, b.x, fill]); }
+    node.append(main, orig); body.append(node);
+  }
+  // ترجمه‌ی پاراگراف‌ها به ترتیب، با سه درخواست هم‌زمان
+  let k = 0;
+  const worker = async () => {
+    while (k < jobs.length && my === readerSeq){
+      const [i, text, fill] = jobs[k++];
+      try { const fa = await gTranslate(text.slice(0, 4500)); if (my !== readerSeq) return; fill(fa); (artTr[item.id] = artTr[item.id] || {})[i] = fa; }
+      catch {}
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  if (my === readerSeq && artTr[item.id]) saveArtTr(item.id);
+}
+$("rClose").onclick = () => $("reader").close();
+$("reader").addEventListener("close", () => { readerSeq++; });
+$("rOrig").onclick = () => {
+  const on = $("rOrig").getAttribute("aria-pressed") !== "true";
+  $("rOrig").setAttribute("aria-pressed", String(on)); $("rOrig").textContent = on ? "پنهان کردن متن اصلی" : "نمایش متن اصلی";
+  document.querySelectorAll("#rBody .o").forEach(o => o.hidden = !on);
+};
 
 /* ---------- settings ---------- */
 let draft;
@@ -821,6 +1086,7 @@ function openSettings(){
   for (const [k, v] of Object.entries(CATS)){ const o = el("option", "", v.label); o.value = k; sel.append(o); }
   paintFeedList(); paintFavEdit();
   document.querySelectorAll('input[name="engine"]').forEach(r => r.checked = r.value === draft.engine);
+  $("ghToken").value = draft.ghToken || ""; $("ghState").textContent = ""; $("ghState").className = "gh-state";
   $("gKey").value = draft.geminiKey; $("gModel").value = draft.geminiModel; $("theme").value = draft.theme;
   $("settings").showModal();
 }
@@ -959,6 +1225,7 @@ $("saveSettings").onclick = () => {
   draft.engine = r ? r.value : "google";
   draft.geminiKey = $("gKey").value.trim(); draft.geminiModel = $("gModel").value.trim() || DEFAULTS.geminiModel;
   draft.theme = $("theme").value;
+  draft.ghToken = $("ghToken").value.trim();
   for (const k of Object.keys(draft.favs)) if (!draft.favs[k].length) delete draft.favs[k];
   const feedsChanged = JSON.stringify(draft.feeds) !== JSON.stringify(settings.feeds);
   const favsChanged = JSON.stringify(draft.favs) !== JSON.stringify(settings.favs || {});
@@ -967,17 +1234,36 @@ $("saveSettings").onclick = () => {
   settings = draft; save("hn:settings", settings);
   if (favsChanged){ favMemo = new Map(); favPick = ""; }
   applyTheme(); renderTabs(); $("settings").close();
-  if (feedsChanged || favsChanged || perFeed() !== depthBefore) refresh(); else { render(); translateAll(); }
+  const cfgChanged = feedsChanged || favsChanged;
+  if (cfgChanged) settings.cfgUpdated = Date.now(), save("hn:settings", settings);
+  render(); translateAll();
+  if (cfgChanged && settings.ghToken){
+    setStatus("در حال ذخیره در GitHub…");
+    pushConfig()
+      .then(() => watchForUpdate(cache.ts || 0, "ذخیره شد. جمع‌کننده شروع به کار کرد؛ چند دقیقه‌ی دیگر خبرهای تازه خودکار می‌آیند."))
+      .catch(e => setStatus("ذخیره در GitHub نشد: " + ghErr(e)));
+  } else if (cfgChanged && !cache.remote) refreshDirect();
+  else if (cfgChanged) setStatus("برای اینکه جمع‌کننده‌ی خودکار علاقه‌مندی‌های جدید را بشناسد، توکن GitHub را در تنظیمات وارد کن.");
 };
 $("clearTr").onclick = () => { tr = {}; save("hn:tr", tr); render(); translateAll(); $("settings").close(); };
 $("closeSettings").onclick = () => $("settings").close();
 $("settings").addEventListener("cancel", e => { if (document.activeElement && document.activeElement.getAttribute("aria-expanded") === "true") e.preventDefault(); });
 $("settingsBtn").onclick = openSettings;
+$("ghToken").onchange = async () => {
+  const st = $("ghState"), tok = $("ghToken").value.trim();
+  st.className = "gh-state"; st.textContent = tok ? "در حال بررسی…" : "";
+  if (!tok) return;
+  try {
+    const r = await fetch("https://api.github.com/repos/" + GH.owner + "/" + GH.repo, {headers:{Authorization:"Bearer " + tok, Accept:"application/vnd.github+json"}});
+    if (!r.ok) throw Object.assign(new Error(), {status:r.status});
+    st.className = "gh-state ok"; st.textContent = "توکن کار می‌کند و به مخزن " + GH.repo + " وصل است.";
+  } catch(e){ st.className = "gh-state bad"; st.textContent = ghErr(e); }
+};
 $("favToggle").onclick = () => {
   if (!hasFavs()){ openSettings(); $("favHead").scrollIntoView({block:"start"}); const i = $("favEdit").querySelector("input"); if (i) i.focus(); return; }
   setFavOnly(!settings.favOnly);
 };
-$("refreshBtn").onclick = refresh;
+$("refreshBtn").onclick = () => refresh(true);
 $("search").oninput = e => { query = e.target.value.trim(); render(); };
 
 /* ---------- petals ---------- */
@@ -993,9 +1279,9 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 
 /* ---------- start ---------- */
 applyTheme(); paintHeader(); renderTabs(); render();
-if (Date.now() - cache.ts > STALE_MS) refresh(); else translateAll();
-setInterval(() => { paintHeader(); if (!document.hidden && Date.now() - cache.ts > STALE_MS) refresh(); }, 60*1000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - cache.ts > STALE_MS) refresh(); });
+loadRemoteConfig().then(changed => { if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
+setInterval(() => { paintHeader(); if (!document.hidden && isStale()) refresh(); }, 60*1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && isStale()) refresh(); });
 })();
 </script>
 </body>
