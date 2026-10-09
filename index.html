@@ -679,9 +679,14 @@ async function requestCollect(){
 }
 const ghErr = e => e.status === 401 ? "توکن نامعتبر یا منقضی است" : e.status === 403 || e.status === 404 ? "توکن اجازه‌ی کافی ندارد" : "اتصال به GitHub برقرار نشد";
 // نسخه‌ی مخزن از تنظیمات، اگر جدیدتر از نسخه‌ی این مرورگر باشد، جایگزین می‌شود
+let remoteCfg = null;
+// آیا علاقه‌مندی‌های این مرورگر همان‌هایی است که جمع‌کننده می‌شناسد؟
+const favKeys = favs => Object.entries(favs || {}).flatMap(([c, l]) => l.map(f => c + ":" + f.name)).sort().join("|");
+const favsSynced = () => !remoteCfg || favKeys(remoteCfg.favs) === favKeys(settings.favs);
 async function loadRemoteConfig(){
   try {
     const c = JSON.parse(await fetchText("config/config.json?t=" + Date.now(), {cache:"no-store"}, 8000));
+    remoteCfg = c;
     if ((c.updated || 0) > (settings.cfgUpdated || 0)){
       if (c.favs) settings.favs = c.favs;
       if (c.feeds && c.feeds.length) settings.feeds = c.feeds;
@@ -994,6 +999,9 @@ function setStatus(msg, trFails = 0){
   if (cache.ts) parts.push(["", "آخرین جمع‌آوری " + ago(cache.ts)]);
   if (translating) parts.push(["", "در حال ترجمه…"]);
   if (cache.failed && cache.failed.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + cache.failed.join("، ")]);
+  if (cache.remote && hasFavs() && !favsSynced())
+    parts.push(["warn", settings.ghToken ? "علاقه‌مندی‌ها هنوز به جمع‌کننده نرسیده‌اند؛ چند دقیقه صبر کن"
+                                         : "علاقه‌مندی‌ها هنوز در GitHub ذخیره نشده‌اند، برای همین خبری برایشان جمع نمی‌شود. توکن را در تنظیمات وارد کن"]);
   if (trFails) parts.push(["warn", "ترجمه‌ی " + trFails.toLocaleString("fa-IR") + " خبر انجام نشد"]);
   parts.forEach(([c, t], i) => { if (i) s.append("، "); s.append(el("span", c, t)); });
 }
@@ -1242,6 +1250,7 @@ $("saveSettings").onclick = () => {
   if (cfgChanged && settings.ghToken){
     setStatus("در حال ذخیره در GitHub…");
     pushConfig()
+      .then(() => { remoteCfg = {favs: JSON.parse(JSON.stringify(settings.favs || {}))}; })
       .then(() => watchForUpdate(cache.ts || 0, "ذخیره شد. جمع‌کننده شروع به کار کرد؛ چند دقیقه‌ی دیگر خبرهای تازه خودکار می‌آیند."))
       .catch(e => setStatus("ذخیره در GitHub نشد: " + ghErr(e)));
   } else if (cfgChanged && !cache.remote) refreshDirect();

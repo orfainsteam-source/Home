@@ -85,8 +85,10 @@ function parseFeed(body, feed){
     let summary = clip(strip(html), 300);
     if (norm(summary).startsWith(norm(title).trimEnd())) summary = "";
     const ts = Date.parse(text(n.pubDate) || text(n.published) || text(n.updated) || text(n["dc:date"])) || 0;
-    return {title, summary, link: okUrl(link), img: okUrl(img), ts, src: feed.search ? (source || feed.name) : feed.name,
-            cat: feed.cat, ...(feed.search ? {search:true, fav:feed.fav} : {})};
+    return {title, summary, link: okUrl(link), img: okUrl(img), ts,
+            src: feed.official ? feed.name + " (رسمی)" : feed.search ? (source || feed.name) : feed.name,
+            cat: feed.cat, ...(feed.search ? {search:true, fav:feed.fav} : {}),
+            ...(feed.official ? {official:true, _html: html} : {})};
   }).filter(x => x.title && x.link);
 }
 
@@ -99,6 +101,48 @@ function searchSources(fav, cat){
     {name:"Google News", url:"https://news.google.com/rss/search?q=" + encodeURIComponent(gq) + "&hl=en-US&gl=US&ceid=US:en"},
     {name:"Bing News", url:"https://www.bing.com/news/search?q=" + encodeURIComponent(bq) + "&format=rss&setlang=en-US&qft=" + encodeURIComponent('sortbydate="1"')}
   ].map(x => ({...x, cat, fav:fav.name, terms:fav.terms, search:true}));
+}
+
+/* ---------- official sources: Steam news and the official site's own feed ---------- */
+async function json(url, opts){ return JSON.parse((await get(url, {tries:2, ms:15000, ...opts})).text); }
+async function discoverFeed(site){
+  try {
+    const page = await get(site, {tries:1, ms:15000});
+    const m = page.text.match(/<link[^>]+type=["']application\/(?:rss|atom)\+xml["'][^>]*>/gi) || [];
+    for (const tag of m){
+      const href = (tag.match(/href=["']([^"']+)/i) || [])[1];
+      if (!href || /comments/i.test(href)) continue;
+      return new URL(href, page.url).href;
+    }
+  } catch {}
+  return "";
+}
+async function officialSources(fav, cat){
+  let steam = "", site = "";
+  try {
+    if (fav.src === "wikidata" && fav.id){
+      const e = (await json("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims&ids=" + fav.id)).entities[fav.id];
+      const v = p => { const c = (e.claims[p] || [])[0]; return c && c.mainsnak.datavalue ? c.mainsnak.datavalue.value : ""; };
+      steam = v("P1733"); site = v("P856");
+    } else if (fav.src === "anilist" && fav.id){
+      const d = await json("https://graphql.anilist.co", {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({query:"query($id:Int){Media(id:$id){externalLinks{site url}}}", variables:{id:+fav.id}})});
+      site = ((d.data.Media.externalLinks || []).find(l => l.site === "Official Site") || {}).url || "";
+    } else if (fav.src === "tvmaze" && fav.id){
+      site = (await json("https://api.tvmaze.com/shows/" + fav.id)).officialSite || "";
+    }
+    // بازی‌ای که دستی اضافه شده: شناسه‌ی Steam را از جست‌وجوی فروشگاه پیدا کن
+    if (!steam && cat === "game"){
+      const d = await json("https://store.steampowered.com/api/storesearch/?l=english&cc=US&term=" + encodeURIComponent(fav.name));
+      const want = norm(fav.name).trim();
+      const hit = (d.items || []).find(x => norm(x.name).trim() === want);
+      if (hit) steam = String(hit.id);
+    }
+  } catch(e){ console.log("official lookup failed", fav.name, e.message); }
+  const out = [];
+  if (/^\d+$/.test(steam || "")) out.push({name:"Steam", url:"https://store.steampowered.com/feeds/news/app/" + steam + "/?l=english"});
+  if (site){ const feed = await discoverFeed(site); if (feed) out.push({name: host(site), url: feed}); }
+  return out.map(x => ({...x, cat, fav:fav.name, terms:fav.terms, search:true, official:true}));
 }
 
 /* ---------- Google News links → real article URL ---------- */
@@ -172,12 +216,20 @@ const prevById = new Map((prev.items || []).map(x => [x.id, x]));
 console.log(`feeds: ${feeds.length}, favourites: ${Object.values(favs).flat().length}, previous items: ${prevById.size}`);
 
 const searches = [];
-for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.terms && f.terms.length) searches.push(...searchSources(f, cat));
+const favList = [];
+for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.terms && f.terms.length){ searches.push(...searchSources(f, cat)); favList.push([f, cat]); }
+for (const r of await pool(favList, 4, ([f, cat]) => officialSources(f, cat))) if (Array.isArray(r)) searches.push(...r);
+console.log("official sources:", searches.filter(s => s.official).map(s => s.fav + " → " + s.name).join(", ") || "none");
 const sources = [...feeds, ...searches];
 const results = await pool(sources, 6, async src => {
   const r = await get(src.url, {tries: src.search ? 3 : 2});
   let items = parseFeed(r.text, src);
-  if (src.search){
+  if (src.official){
+    items = items.sort((a, b) => b.ts - a.ts).slice(0, 10);
+    const app = (src.url.match(/\/app\/(\d+)/) || [])[1];
+    if (app) for (const x of items) if (!x.img) x.img = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/" + app + "/header.jpg";
+  }
+  else if (src.search){
     // فقط خبرهایی که اسم علاقه‌مندی در تیترشان هست
     const terms = src.terms.map(norm).filter(t => t.trim());
     items = items.filter(x => terms.some(t => norm(x.title).includes(t)))
@@ -221,6 +273,13 @@ for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.img)
 await fs.mkdir(path.join(OUT, "a"), {recursive:true});
 const fresh = [];
 for (const x of all){
+  if (x.official){
+    const blocks = cleanArticle(x._html || "", x.link);
+    const words = blocks.filter(b => b.t !== "img").reduce((n, b) => n + b.x.split(" ").length, 0);
+    if (words >= 30){ x.full = true; await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:x.link, blocks})); }
+    if (!x.img){ const im = blocks.find(b => b.t === "img"); if (im) x.img = im.s; }
+    x.checked = true; continue;
+  }
   const old = prevById.get(x.id);
   if (old && old.checked){ x.img = x.img || old.img; x.full = old.full; x.checked = true; if (!x.summary && old.summary) x.summary = old.summary;
     if (old.full){ const a = await remoteJson("/data/a/" + x.id + ".json"); if (a) await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify(a)); else x.full = false; } }
@@ -243,7 +302,7 @@ await pool(fresh.slice(0, ARTICLE_BUDGET), 8, async x => {
 });
 for (const x of all){
   if (!x.img && x.fav) x.img = favImg[x.cat + ":" + x.fav] || "";
-  delete x.terms;
+  delete x.terms; delete x._html;
 }
 console.log(`enriched: ${enriched}, with image: ${all.filter(x => x.img).length}/${all.length}, full text: ${all.filter(x => x.full).length}`);
 
