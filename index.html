@@ -1231,10 +1231,12 @@ $("saveSettings").onclick = () => {
   const favsChanged = JSON.stringify(draft.favs) !== JSON.stringify(settings.favs || {});
   const depthBefore = perFeed();
   if (favsChanged && !hasFavs()) draft.favOnly = true;   // اولین بار که علاقه‌مندی اضافه می‌شود، فیلتر روشن باشد
+  const tokenBefore = settings.ghToken;
   settings = draft; save("hn:settings", settings);
   if (favsChanged){ favMemo = new Map(); favPick = ""; }
   applyTheme(); renderTabs(); $("settings").close();
-  const cfgChanged = feedsChanged || favsChanged;
+  // توکن تازه وارد شده: علاقه‌مندی‌های فعلی این مرورگر را هم یک بار به مخزن بفرست
+  const cfgChanged = feedsChanged || favsChanged || (settings.ghToken && settings.ghToken !== tokenBefore && hasFavs());
   if (cfgChanged) settings.cfgUpdated = Date.now(), save("hn:settings", settings);
   render(); translateAll();
   if (cfgChanged && settings.ghToken){
