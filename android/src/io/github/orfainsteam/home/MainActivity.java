@@ -8,10 +8,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.webkit.CookieManager;
+import android.webkit.ValueCallback;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -91,10 +90,12 @@ public class MainActivity extends Activity {
         // اول پنجره‌ی باز (خواندن خبر یا تنظیمات) بسته شود، بعد صفحه‌ی قبل، بعد خروج
         web.evaluateJavascript(
             "(function(){var d=[].slice.call(document.querySelectorAll('dialog[open]')).pop();if(d){d.close();return 1}return 0})()",
-            v -> {
-                if ("1".equals(v)) return;
-                if (web.canGoBack()) web.goBack();
-                else finish();
+            new ValueCallback<String>() {
+                @Override public void onReceiveValue(String v) {
+                    if ("1".equals(v)) return;
+                    if (web.canGoBack()) web.goBack();
+                    else finish();
+                }
             });
     }
 
