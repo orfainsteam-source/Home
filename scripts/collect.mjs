@@ -21,7 +21,8 @@ const DEFAULT_FEEDS = [
   {name:"Anime News Network", url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:true},
   {name:"MyAnimeList", url:"https://myanimelist.net/rss/news.xml", cat:"anime", on:true},
   {name:"Anime Corner", url:"https://animecorner.me/feed/", cat:"anime", on:true},
-  {name:"Cartoon Brew", url:"https://www.cartoonbrew.com/feed", cat:"animation", on:true}
+  {name:"Cartoon Brew", url:"https://www.cartoonbrew.com/feed", cat:"animation", on:true},
+  {name:"ویجیاتو", url:"https://t.me/s/vigiatonet", cat:"game", on:true, lang:"fa"}
 ];
 const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], animation:["animated","series","season"], tech:["tech"], other:[]};
 const PER_FEED = 20, PER_SEARCH = 15, MAX_FEED_ITEMS = 160, SEARCH_DAYS = 30;
@@ -87,9 +88,35 @@ function parseFeed(body, feed){
     const ts = Date.parse(text(n.pubDate) || text(n.published) || text(n.updated) || text(n["dc:date"])) || 0;
     return {title, summary, link: okUrl(link), img: okUrl(img), ts,
             src: feed.official ? feed.name + " (رسمی)" : feed.search ? (source || feed.name) : feed.name,
-            cat: feed.cat, ...(feed.search ? {search:true, fav:feed.fav} : {}),
+            cat: feed.cat, ...(feed.lang ? {lang:feed.lang} : {}), ...(feed.search ? {search:true, fav:feed.fav} : {}),
             ...(feed.official ? {official:true, _html: html} : {})};
   }).filter(x => x.title && x.link);
+}
+
+/* ---------- public Telegram channels (t.me/s/<name>) ---------- */
+// سایت‌های ایرانی از خارج از ایران در دسترس نیستند، اما کانال تلگرامشان هست
+const tgName = url => (url.match(/^https?:\/\/(?:t\.me|telegram\.me)\/(?:s\/)?([A-Za-z0-9_]{4,})/i) || [])[1] || "";
+function parseTelegram(page, feed){
+  const name = tgName(feed.url);
+  const ent = t => t.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  return page.split('<div class="tgme_widget_message_wrap').slice(1).map(m => {
+    const post = (m.match(/data-post="([^"]+)"/) || [])[1];
+    const body = (m.match(/<div class="tgme_widget_message_text[^>]*>([\s\S]*?)<\/div>/) || [])[1];
+    if (!post || !body) return null;
+    const textAll = ent(body.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "")).replace(/\r/g, "");
+    // خط‌های تبلیغ کانال و هشتگ‌ها را حذف کن
+    const lines = textAll.split("\n").map(l => l.replace(/^[\s\p{Extended_Pictographic}\u200d\ufe0f⏺•▪️◾️🔸🔹➖]+/u, "").trim())
+      .filter(l => l && !/^(@|#|https?:\/\/t\.me|🆔)/i.test(l) && !/@\w{4,}\s*$/.test(l)
+                && !(l.length < 60 && /(مطالعه کامل|ادامه مطلب|بیشتر بخوانید|مشاهده کامل|لینک مطلب)/.test(l)));
+    if (!lines.length) return null;
+    const title = lines[0].slice(0, 220);
+    const paras = lines.slice(1);
+    const img = (m.match(/tgme_widget_message_photo_wrap[^>]*background-image:url\('([^']+)'\)/) || [])[1] || "";
+    const site = (m.match(/href="(https?:\/\/(?!t\.me)[^"]+)"/) || [])[1] || "";
+    const ts = Date.parse((m.match(/<time datetime="([^"]+)"/) || [])[1] || "") || 0;
+    return {title, summary: clip(paras.join(" "), 300), link: ent(site) || "https://t.me/" + post, img: okUrl(img), ts, src: feed.name, cat: feed.cat,
+            lang: feed.lang || "", _tg: [...paras.map(x => ({t:"p", x}))]};
+  }).filter(Boolean).reverse();
 }
 
 function searchSources(fav, cat){
@@ -222,8 +249,9 @@ for (const r of await pool(favList, 4, ([f, cat]) => officialSources(f, cat))) i
 console.log("official sources:", searches.filter(s => s.official).map(s => s.fav + " → " + s.name).join(", ") || "none");
 const sources = [...feeds, ...searches];
 const results = await pool(sources, 6, async src => {
-  const r = await get(src.url, {tries: src.search ? 3 : 2});
-  let items = parseFeed(r.text, src);
+  const tg = !src.search && tgName(src.url);
+  const r = await get(tg ? "https://t.me/s/" + tg : src.url, {tries: src.search ? 3 : 2});
+  let items = tg ? parseTelegram(r.text, src) : parseFeed(r.text, src);
   if (src.official){
     items = items.sort((a, b) => b.ts - a.ts).slice(0, 10);
     const app = (src.url.match(/\/app\/(\d+)/) || [])[1];
@@ -273,6 +301,12 @@ for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.img)
 await fs.mkdir(path.join(OUT, "a"), {recursive:true});
 const fresh = [];
 for (const x of all){
+  if (x._tg){
+    const old = prevById.get(x.id);
+    if (x._tg.length){ x.full = true; await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:x.link, blocks:x._tg})); }
+    if (!x.img && old) x.img = old.img;
+    x.checked = true; continue;
+  }
   if (x.official){
     const blocks = cleanArticle(x._html || "", x.link);
     const words = blocks.filter(b => b.t !== "img").reduce((n, b) => n + b.x.split(" ").length, 0);
@@ -302,7 +336,7 @@ await pool(fresh.slice(0, ARTICLE_BUDGET), 8, async x => {
 });
 for (const x of all){
   if (!x.img && x.fav) x.img = favImg[x.cat + ":" + x.fav] || "";
-  delete x.terms; delete x._html;
+  delete x.terms; delete x._html; delete x._tg;
 }
 console.log(`enriched: ${enriched}, with image: ${all.filter(x => x.img).length}/${all.length}, full text: ${all.filter(x => x.full).length}`);
 
