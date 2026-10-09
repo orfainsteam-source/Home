@@ -1,5 +1,5 @@
 {
-  "updated": 1791585595179,
+  "updated": 1791585795660,
   "feeds": [
     {
       "name": "IGN",
@@ -75,6 +75,103 @@
         "page": "https://www.wikidata.org/wiki/Q64826862",
         "imdb": "https://www.imdb.com/title/tt10562854/",
         "imdbExact": true
+      },
+      {
+        "name": "Grand Theft Auto VI",
+        "terms": [
+          "Grand Theft Auto VI",
+          "Grand Theft Auto 6",
+          "GTA VI",
+          "GTA 6"
+        ],
+        "src": "wikidata",
+        "id": "Q23648408",
+        "page": "https://www.wikidata.org/wiki/Q23648408",
+        "imdb": "https://www.imdb.com/title/tt18282598/",
+        "imdbExact": true
+      },
+      {
+        "name": "Mafia",
+        "terms": [
+          "Mafia"
+        ],
+        "src": "wikidata",
+        "id": "Q21526531",
+        "page": "https://www.wikidata.org/wiki/Q21526531",
+        "imdb": "",
+        "imdbExact": false
+      },
+      {
+        "name": "Mafia II",
+        "terms": [
+          "Mafia II",
+          "Mafia 2"
+        ],
+        "src": "wikidata",
+        "id": "Q59154",
+        "page": "https://www.wikidata.org/wiki/Q59154",
+        "imdb": "https://www.imdb.com/title/tt1181833/",
+        "imdbExact": true
+      },
+      {
+        "name": "Mafia III",
+        "terms": [
+          "Mafia III",
+          "Mafia 3"
+        ],
+        "src": "wikidata",
+        "id": "Q20737889",
+        "page": "https://www.wikidata.org/wiki/Q20737889",
+        "imdb": "https://www.imdb.com/title/tt4936406/",
+        "imdbExact": true
+      },
+      {
+        "name": "Mafia: The Old Country",
+        "terms": [
+          "Mafia: The Old Country"
+        ],
+        "src": "wikidata",
+        "id": "Q111272660",
+        "page": "https://www.wikidata.org/wiki/Q111272660",
+        "imdb": "https://www.imdb.com/title/tt33238076/",
+        "imdbExact": true
+      },
+      {
+        "name": "God of War",
+        "terms": [
+          "God of War",
+          "GoW",
+          "2005 God of War"
+        ],
+        "src": "wikidata",
+        "id": "Q817369",
+        "page": "https://www.wikidata.org/wiki/Q817369",
+        "imdb": "https://www.imdb.com/title/tt0416779/",
+        "imdbExact": true
+      },
+      {
+        "name": "God of War II",
+        "terms": [
+          "God of War II",
+          "God of war"
+        ],
+        "src": "wikidata",
+        "id": "Q2252689",
+        "page": "https://www.wikidata.org/wiki/Q2252689",
+        "imdb": "https://www.imdb.com/title/tt0846694/",
+        "imdbExact": true
+      },
+      {
+        "name": "Phantom Blade Zero",
+        "terms": [
+          "Phantom Blade Zero",
+          "phantom blade"
+        ],
+        "src": "wikidata",
+        "id": "Q118645482",
+        "page": "https://www.wikidata.org/wiki/Q118645482",
+        "imdb": "https://www.imdb.com/title/tt27916716/",
+        "imdbExact": true
       }
     ],
     "anime": [
@@ -101,6 +198,18 @@
         "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx120120-cWDmnmeEntSe.jpg",
         "page": "https://anilist.co/anime/120120",
         "imdb": "https://www.imdb.com/title/tt13196080/",
+        "imdbExact": true
+      },
+      {
+        "name": "Bleach",
+        "terms": [
+          "Bleach"
+        ],
+        "src": "anilist",
+        "id": 269,
+        "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx269-d2GmRkJbMopq.png",
+        "page": "https://anilist.co/anime/269",
+        "imdb": "https://www.imdb.com/title/tt0434665/",
         "imdbExact": true
       }
     ]
