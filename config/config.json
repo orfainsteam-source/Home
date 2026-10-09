@@ -1,5 +1,5 @@
 {
-  "updated": 1791585795660,
+  "updated": 1791587776905,
   "feeds": [
     {
       "name": "IGN",
@@ -48,6 +48,19 @@
       "url": "https://animecorner.me/feed/",
       "cat": "anime",
       "on": true
+    },
+    {
+      "name": "Cartoon Brew",
+      "url": "https://www.cartoonbrew.com/feed",
+      "cat": "animation",
+      "on": true
+    },
+    {
+      "name": "ویجیاتو",
+      "url": "https://t.me/s/vigiatonet",
+      "cat": "game",
+      "on": true,
+      "lang": "fa"
     }
   ],
   "favs": {
