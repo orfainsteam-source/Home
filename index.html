@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خانه‌ی من</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F2FF; --surface:#FFFFFF; --ink:#1F1A3D; --muted:#655F8C; --line:#E0DCF3;
+  --glass:rgb(255 255 255 / .84); --game:#0B8C94; --anime:#D2306F; --tech:#6A4FD0; --other:#A86A10;
+  --display:"Lalezar","Vazirmatn",Tahoma,sans-serif;
+  --body:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
+    --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
+  --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.75;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--anime);outline-offset:2px;border-radius:6px}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:28px 20px 60px}
+
+/* themed backgrounds */
+.scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.scene>div{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}
+body[data-tab="game"] .s-game,body[data-tab="anime"] .s-anime{opacity:1}
+body[data-tab="all"] .s-game,body[data-tab="all"] .s-anime{opacity:.7}
+.s-game{background:radial-gradient(120% 55% at 50% 100%,color-mix(in srgb,var(--game) 24%,transparent),transparent 70%)}
+.s-game .sun{position:absolute;left:50%;bottom:34%;width:min(70vw,440px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;
+  background:linear-gradient(var(--anime),var(--game));opacity:.22;
+  -webkit-mask-image:repeating-linear-gradient(#000 0 14px,transparent 14px 20px);mask-image:repeating-linear-gradient(#000 0 14px,transparent 14px 20px)}
+.s-game .floor{position:absolute;left:-50%;right:-50%;bottom:-8%;height:58%;
+  background-image:linear-gradient(color-mix(in srgb,var(--game) 65%,transparent) 1px,transparent 1px),
+                   linear-gradient(90deg,color-mix(in srgb,var(--game) 65%,transparent) 1px,transparent 1px);
+  background-size:56px 56px;transform:perspective(380px) rotateX(62deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,#000 10%,transparent 90%);mask-image:linear-gradient(to top,#000 10%,transparent 90%);
+  animation:floor 2.5s linear infinite}
+@keyframes floor{to{background-position:0 56px}}
+.s-game .scan{background:repeating-linear-gradient(to bottom,color-mix(in srgb,var(--ink) 5%,transparent) 0 1px,transparent 1px 4px)}
+.s-game>*{position:absolute;inset:auto}
+.s-game .scan{inset:0}
+.s-anime .speed{position:absolute;inset:-30%;
+  background:repeating-conic-gradient(from 0deg at 80% 25%,color-mix(in srgb,var(--anime) 20%,transparent) 0 .7deg,transparent .7deg 5deg);
+  -webkit-mask-image:radial-gradient(circle at 80% 25%,transparent 10%,#000 30%,transparent 62%);
+  mask-image:radial-gradient(circle at 80% 25%,transparent 10%,#000 30%,transparent 62%)}
+.s-anime .dots{position:absolute;left:0;bottom:0;width:75%;height:65%;
+  background-image:radial-gradient(color-mix(in srgb,var(--anime) 60%,transparent) 1.5px,transparent 2px);background-size:13px 13px;
+  -webkit-mask-image:radial-gradient(circle at 0% 100%,#000,transparent 70%);mask-image:radial-gradient(circle at 0% 100%,#000,transparent 70%)}
+.petal{position:absolute;top:-24px;width:14px;height:11px;background:var(--anime);border-radius:100% 0 100% 0;opacity:.75;
+  animation:fall linear infinite}
+@keyframes fall{from{transform:translate(0,-5vh) rotate(0)}to{transform:translate(-22vw,110vh) rotate(600deg)}}
+body[data-tab="game"] .petal{animation-play-state:paused}
+
+/* header */
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,8vw,4.6rem);line-height:1;margin:0;letter-spacing:0}
+h1 .mark{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-inline-start:.18em;
+  background:conic-gradient(var(--game) 0 50%,var(--anime) 0 100%);vertical-align:.1em}
+.today{color:var(--muted);margin-top:10px;font-size:1.02rem}
+.actions{display:flex;gap:8px}
+.icon-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);
+  padding:9px 14px;border-radius:999px;cursor:pointer;font-weight:500}
+.icon-btn:hover{border-color:var(--muted)}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn.busy svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(-360deg)}}
+
+/* toolbar */
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:2px solid var(--line);background:transparent;padding:6px 16px;border-radius:999px;cursor:pointer;font-weight:700}
+.tab[aria-selected="true"]{background:var(--c,var(--ink));border-color:var(--c,var(--ink));color:var(--bg)}
+.search{flex:1;min-width:180px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px}
+.status{color:var(--muted);font-size:.9rem;min-height:1.6em;margin-bottom:18px}
+.status .warn{color:var(--other)}
+
+/* news */
+.lead{display:grid;grid-template-columns:1.25fr 1fr;gap:0;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.card{background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-inline-start:5px solid var(--c);
+  border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+/* game cards: HUD panel with cut corners */
+.card.game{border-radius:0;border-color:color-mix(in srgb,var(--game) 40%,var(--line));border-inline-start:5px solid var(--game);
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))}
+.card.game .src{letter-spacing:.02em}
+/* anime cards: manga panel with offset ink shadow */
+.card.anime{border:2px solid var(--ink);border-radius:6px;box-shadow:6px 6px 0 var(--anime)}
+.card.anime .thumb{border-bottom:2px solid var(--ink)}
+.lead.card.anime .thumb{border-bottom:0;border-inline-end:2px solid var(--ink)}
+.lead.card{display:grid}
+.thumb{aspect-ratio:16/9;background:var(--line);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.lead .thumb{aspect-ratio:auto;min-height:260px}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:.85rem;color:var(--muted)}
+.src{color:var(--c);font-weight:700}
+.card h2{font-size:1.12rem;line-height:1.6;margin:0;font-weight:700}
+.lead h2{font-family:var(--display);font-weight:400;font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.35}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.pending{opacity:.55}
+.orig{direction:ltr;text-align:left;font-family:system-ui,sans-serif;font-size:.9rem;border-top:1px dashed var(--line);padding-top:8px;color:var(--muted)}
+.orig[hidden]{display:none}
+.links{margin-top:auto;display:flex;gap:16px;padding-top:6px;font-size:.9rem}
+.links a,.links button{color:var(--c);font-weight:700;background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
+.links a:hover,.links button:hover{text-decoration:underline}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .btn{margin-top:14px}
+
+/* favourites */
+.fav-toggle[aria-pressed="true"]{background:var(--other);border-color:var(--other);color:var(--bg)}
+.favbar{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.favbar[hidden]{display:none}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);
+  border-radius:999px;padding:4px 13px;cursor:pointer;font-size:.9rem}
+.chip .c{color:var(--muted);font-size:.8rem}
+.chip[aria-pressed="true"]{background:var(--c,var(--ink));border-color:var(--c,var(--ink));color:var(--bg)}
+.chip[aria-pressed="true"] .c{color:inherit}
+.chip.zero{opacity:.5}
+.chip .n{direction:ltr;unicode-bidi:isolate}
+.meta .fav{margin-inline-start:auto;color:var(--other);font-weight:700;direction:ltr;unicode-bidi:isolate}
+.fav-cat{border:1px solid var(--line);border-inline-start:4px solid var(--c);border-radius:10px;padding:10px 12px;margin-top:10px}
+.fav-cat>strong{color:var(--c)}
+.fav-list{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.fav-list:empty{display:none}
+.fav-tag{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;
+  padding:3px 8px 3px 12px;direction:ltr;font-size:.9rem}
+.fav-tag small{color:var(--muted)}
+.fav-tag .del{font-size:.9rem;padding:0 2px}
+.fav-add{display:flex;gap:8px;margin-top:6px;position:relative}
+.fav-tag img{width:20px;height:20px;border-radius:50%;object-fit:cover;margin-inline-start:-6px}
+.fav-tag a{color:var(--c);font-weight:700;font-size:.75rem;text-decoration:none}
+.fav-tag a:hover{text-decoration:underline}
+.sugg{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:5;margin:0;padding:4px;list-style:none;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgb(10 8 30 / .2);
+  max-height:330px;overflow-y:auto}
+.sugg[hidden]{display:none}
+.sugg li{display:flex;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;cursor:pointer}
+.sugg li[aria-selected="true"]{background:color-mix(in srgb,var(--c) 15%,transparent)}
+.sugg .pic{width:32px;height:44px;border-radius:4px;flex:none;object-fit:cover;background:color-mix(in srgb,var(--c) 22%,var(--bg));
+  display:grid;place-items:center;font-weight:700;color:var(--c);font-family:system-ui,sans-serif}
+.sugg .tx{min-width:0;flex:1;direction:ltr;text-align:left}
+.sugg b{display:block;font-weight:700;line-height:1.4}
+.sugg small{display:block;color:var(--muted);font-size:.78rem;line-height:1.45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sugg li.free .tx{direction:rtl;text-align:right}
+.sugg li.msg{color:var(--muted);cursor:default;font-size:.88rem}
+.fav-info{display:flex;gap:14px;align-items:center;margin:0 0 16px;padding:10px 14px;border:1px solid var(--line);
+  border-inline-start:4px solid var(--c);border-radius:12px;background:var(--glass)}
+.fav-info[hidden]{display:none}
+.fav-info img{width:48px;height:66px;object-fit:cover;border-radius:6px;flex:none}
+.fav-info .tx{flex:1;min-width:0}
+.fav-info strong{display:block;direction:ltr;text-align:right;font-size:1.05rem}
+.fav-info small{display:block;color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fav-info .links{padding:0;margin:0}
+.fav-add input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 12px}
+
+/* settings */
+dialog{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;padding:0;width:min(640px,94vw);max-height:88vh}
+dialog::backdrop{background:rgb(10 8 30 / .55)}
+.dlg{padding:22px;overflow-y:auto;max-height:88vh}
+.dlg h3{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 4px}
+.dlg h4{margin:22px 0 8px;font-size:1rem}
+.hint{color:var(--muted);font-size:.85rem;margin:4px 0 0}
+.feed-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.feed-row .n{flex:1;min-width:0}
+.feed-row .u{display:block;direction:ltr;text-align:right;font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:1.1rem}
+.add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.add input,.add select,.field input,.field select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 12px}
+.add .full{grid-column:1/-1}
+.field{display:grid;gap:4px;margin-top:10px}
+.ltr{direction:ltr;text-align:left}
+.radio{display:flex;gap:18px;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:9px 20px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.dlg-foot{display:flex;gap:8px;justify-content:flex-start;margin-top:22px}
+
+@media (max-width:760px){
+  .lead,.lead.card{grid-template-columns:1fr}
+  .lead .thumb{aspect-ratio:16/9;min-height:0}
+  .add{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.icon-btn.busy svg,.s-game .floor{animation:none}.petal{display:none}.scene>div{transition:none}}
+</style>
+</head>
+<body data-tab="all">
+<div class="scene" aria-hidden="true">
+  <div class="s-game"><div class="sun"></div><div class="floor"></div><div class="scan"></div></div>
+  <div class="s-anime"><div class="speed"></div><div class="dots"></div></div>
+</div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="greet">سلام<span class="mark" aria-hidden="true"></span></h1>
+      <div class="today" id="today"></div>
+    </div>
+    <div class="actions">
+      <button class="icon-btn" id="refreshBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+        به‌روزرسانی
+      </button>
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="تنظیمات">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        تنظیمات
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <button class="icon-btn fav-toggle" id="favToggle" type="button" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>
+      <span id="favToggleTxt">علاقه‌مندی‌ها</span>
+    </button>
+    <input class="search" id="search" type="search" placeholder="جست‌وجو در خبرها">
+  </div>
+  <div class="favbar" id="favbar" hidden></div>
+  <div class="fav-info" id="favInfo" hidden></div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <main id="feed"></main>
+</div>
+
+<dialog id="settings">
+  <div class="dlg">
+    <h3>تنظیمات</h3>
+    <p class="hint">همه‌چیز فقط در مرورگر خودتان ذخیره می‌شود.</p>
+
+    <h4>منابع خبر</h4>
+    <div id="feedList"></div>
+    <div class="add">
+      <input id="newName" placeholder="اسم منبع (مثلاً Kotaku)">
+      <select id="newCat"></select>
+      <input id="newUrl" class="full ltr" placeholder="https://example.com/rss" inputmode="url">
+      <button class="btn ghost full" id="addFeed" type="button">افزودن منبع</button>
+    </div>
+    <p class="hint">هر سایتی که فید RSS دارد را می‌شود اضافه کرد.</p>
+
+    <h4 id="favHead">علاقه‌مندی‌ها</h4>
+    <p class="hint">اسم را تایپ کن و از پیشنهادها مورد درست را انتخاب کن. اسم رسمی و اسم‌های دیگرش خودکار ثبت می‌شوند. پیشنهاد بازی‌ها از Wikidata و انیمه‌ها از AniList می‌آید. اگر چیزی پیدا نشد، می‌توانی همان متن را دستی اضافه کنی. اسم‌های دیگر را با کاما جدا کن، مثلاً <span class="ltr" dir="ltr">GTA 6, GTA VI</span>. برای هر کدام، آخرین خبرهای یک ماه اخیر از کل اینترنت (Google News و Bing News) جمع می‌شود. بخشی که خالی بماند، همه‌ی خبرهای منابعش نشان داده می‌شود.</p>
+    <div id="favEdit"></div>
+
+    <h4>ترجمه</h4>
+    <div class="radio">
+      <label><input type="radio" name="engine" value="google"> گوگل (رایگان، بدون کلید)</label>
+      <label><input type="radio" name="engine" value="gemini"> Gemini (روان‌تر، کلید لازم دارد)</label>
+    </div>
+    <div class="field">
+      <label for="gKey">کلید API جمینای</label>
+      <input id="gKey" class="ltr" type="password" autocomplete="off" placeholder="AIza...">
+      <span class="hint">کلید رایگان را از aistudio.google.com بگیرید.</span>
+    </div>
+    <div class="field">
+      <label for="gModel">مدل جمینای</label>
+      <input id="gModel" class="ltr" placeholder="gemini-3.5-flash">
+    </div>
+
+    <h4>ظاهر</h4>
+    <div class="field">
+      <select id="theme">
+        <option value="auto">مثل دستگاه</option>
+        <option value="light">روشن</option>
+        <option value="dark">تیره</option>
+      </select>
+    </div>
+
+    <div class="dlg-foot">
+      <button class="btn" id="saveSettings" type="button">ذخیره</button>
+      <button class="btn ghost" id="clearTr" type="button">پاک کردن ترجمه‌های قبلی</button>
+      <button class="btn ghost" id="closeSettings" type="button">بستن</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+"use strict";
+
+const CATS = {
+  game:  {label:"گیم",      color:"var(--game)"},
+  anime: {label:"انیمه",    color:"var(--anime)"},
+  tech:  {label:"تکنولوژی", color:"var(--tech)"},
+  other: {label:"سایر",     color:"var(--other)"}
+};
+
+const DEFAULT_FEEDS = [
+  {name:"IGN",               url:"https://feeds.feedburner.com/ign/news",                      cat:"game",  on:true},
+  {name:"GameSpot",          url:"https://www.gamespot.com/feeds/news/",                       cat:"game",  on:true},
+  {name:"PC Gamer",          url:"https://www.pcgamer.com/rss/",                               cat:"game",  on:true},
+  {name:"Polygon",           url:"https://www.polygon.com/rss/index.xml",                      cat:"game",  on:true},
+  {name:"Eurogamer",         url:"https://www.eurogamer.net/feed",                             cat:"game",  on:false},
+  {name:"Anime News Network",url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:true},
+  {name:"MyAnimeList",       url:"https://myanimelist.net/rss/news.xml",                       cat:"anime", on:true},
+  {name:"Anime Corner",      url:"https://animecorner.me/feed/",                               cat:"anime", on:true}
+];
+
+const DEFAULTS = {feeds:DEFAULT_FEEDS, engine:"google", geminiKey:"", geminiModel:"gemini-3.5-flash", theme:"auto", favs:{}, favOnly:true};
+const STALE_MS = 20*60*1000;
+// کلمه‌ای که کنار اسم علاقه‌مندی در جست‌وجو می‌آید تا نتیجه‌های بی‌ربط (مثلاً One Piece در معنای دیگر) کم شود
+const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], tech:["tech"], other:[]};
+const SEARCH_DAYS = 30, PER_SEARCH = 15;
+function searchSources(fav, cat){
+  const quoted = fav.terms.map(t => '"' + t.replace(/"/g, "") + '"');
+  const words = CAT_WORDS[cat] || [];
+  const gq = "(" + quoted.join(" OR ") + ")" + (words.length ? " (" + words.join(" OR ") + ")" : "") + " when:" + SEARCH_DAYS + "d";
+  const bq = quoted.join(" OR ") + (words.length ? " " + words[0] : "");   // بینگ با پرانتز نتیجه نمی‌دهد
+  return [
+    {name:"Google News", url:"https://news.google.com/rss/search?q=" + encodeURIComponent(gq) + "&hl=en-US&gl=US&ceid=US:en"},
+    {name:"Bing News",   url:"https://www.bing.com/news/search?q=" + encodeURIComponent(bq) + "&format=rss&setlang=en-US&qft=" + encodeURIComponent('sortbydate="1"')}
+  ].map(x => ({...x, cat, fav:fav.name, search:true, limit:PER_SEARCH}));
+}
+/* ---------- name lookup (autocomplete) ---------- */
+const isLatin = t => /^[\p{Script=Latin}\p{N}\p{P}\p{Zs}\p{S}]+$/u.test(t);
+const hasWord = (hay, needle) => norm(hay).includes(norm(needle));
+// فهرست اسم‌ها: اسم رسمی اول، بدون تکرار، فقط لاتین، حداکثر ۶ تا
+function buildTerms(main, more, typed){
+  const out = [], seen = new Set();
+  const push = t => { t = (t || "").trim(); const k = norm(t).trim(); if (k.length < 3 || seen.has(k) || !isLatin(t)) return; seen.add(k); out.push(t); };
+  push(main); more.forEach(push);
+  // چیزی که کاربر تایپ کرده هم اسم معتبری است، به شرطی که کامل باشد (مثل Frieren، نه Fri)
+  if (typed && ([main, ...more].some(t => hasWord(t, typed)) || [main, ...more].some(t => norm(t).replace(/ /g, "") === norm(typed).replace(/ /g, "")))) push(typed);
+  return out.slice(0, 6);
+}
+const imdbSearch = q => "https://www.imdb.com/find/?q=" + encodeURIComponent(q) + "&s=tt";
+
+async function suggestAnime(q){
+  const query = `query($q:String){Page(perPage:8){media(search:$q,type:ANIME,sort:SEARCH_MATCH){
+    id idMal title{romaji english} synonyms format seasonYear coverImage{medium} siteUrl}}}`;
+  const d = JSON.parse(await fetchText("https://graphql.anilist.co", {method:"POST",
+    headers:{"Content-Type":"application/json", Accept:"application/json"}, body: JSON.stringify({query, variables:{q}})}, 10000));
+  return d.data.Page.media.map(m => {
+    const name = m.title.english || m.title.romaji;
+    const fmt = {TV:"TV", TV_SHORT:"TV", MOVIE:"Movie", OVA:"OVA", ONA:"ONA", SPECIAL:"Special"}[m.format] || m.format || "";
+    const sub = [fmt, m.seasonYear, m.title.english && m.title.romaji !== m.title.english ? m.title.romaji : ""].filter(Boolean).join(" | ");
+    return {name, sub, img: safeUrl(m.coverImage && m.coverImage.medium), pick: () => pickAnime(m, q)};
+  });
+}
+async function pickAnime(m, typed){
+  const name = m.title.english || m.title.romaji;
+  const short = (m.title.english || "").split(/[:：]/)[0];
+  // مترادف‌های AniList اغلب ترجمه‌ی ایتالیایی و پرتغالی و… هستند؛ فقط وقتی اسم انگلیسی نیست سراغشان برو
+  const syn = m.title.english ? [] : (m.synonyms || []).filter(t => /^[\x20-\x7E’]+$/.test(t)).slice(0, 2);
+  const terms = buildTerms(name, [m.title.romaji, short.length >= 4 ? short : "", ...syn], typed);
+  let imdb = "";
+  try {   // شناسه‌ی IMDb را از Wikidata با شناسه‌ی AniList یا MyAnimeList پیدا کن
+    const sparql = `SELECT ?imdb WHERE { { ?i wdt:P8729 "${m.id}" } UNION { ?i wdt:P4086 "${m.idMal || 0}" } ?i wdt:P345 ?imdb } LIMIT 1`;
+    const r = JSON.parse(await fetchText("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(sparql),
+      {headers:{Accept:"application/sparql-results+json"}}, 10000));
+    const b = r.results.bindings[0];
+    if (b && /^tt\d+$/.test(b.imdb.value)) imdb = "https://www.imdb.com/title/" + b.imdb.value + "/";
+  } catch {}
+  return {name, terms, src:"anilist", id:m.id, img: safeUrl(m.coverImage && m.coverImage.medium),
+          page: safeUrl(m.siteUrl), imdb: imdb || imdbSearch(short.length >= 4 ? short : name), imdbExact: !!imdb};
+}
+
+const GAME_RE = /video game|game series|game franchise|esports|expansion|game engine|\bmmo/i;
+async function suggestWikidata(q, cat){
+  const d = JSON.parse(await fetchText("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&type=item&limit=15&language=en&uselang=en&search=" + encodeURIComponent(q), {}, 10000));
+  let list = d.search || [];
+  if (cat === "game"){ const g = list.filter(x => GAME_RE.test(x.description || "")); if (g.length) list = g; }
+  return list.slice(0, 8).map(x => ({name: x.label || x.id, sub: x.description || "", img:"",
+    pick: () => pickWikidata(x.id, x.label, q)}));
+}
+async function pickWikidata(id, label, typed){
+  let aliases = [], imdb = "", name = label;
+  try {
+    const d = JSON.parse(await fetchText("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=labels|aliases|claims&languages=en&ids=" + id, {}, 10000));
+    const e = d.entities[id];
+    name = (e.labels.en && e.labels.en.value) || label;
+    aliases = ((e.aliases && e.aliases.en) || []).map(a => a.value);
+    const c = (e.claims.P345 || [])[0];
+    const v = c && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+    if (/^tt\d+$/.test(v || "")) imdb = "https://www.imdb.com/title/" + v + "/";
+  } catch {}
+  return {name, terms: buildTerms(name, aliases, typed), src:"wikidata", id,
+          page:"https://www.wikidata.org/wiki/" + id, imdb, imdbExact: !!imdb};
+}
+const suggestFor = (cat, q) => cat === "anime" ? suggestAnime(q) : suggestWikidata(q, cat);
+
+const FAV_HINT = {game:"Dota 2, Elden Ring…", anime:"One Piece, Frieren…", tech:"Steam Deck…", other:"Keyword…"};
+
+/* ---------- storage ---------- */
+const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+let settings = Object.assign({}, DEFAULTS, load("hn:settings", {}));
+// مدل‌های جمینای ۱.x و ۲.x خاموش شده‌اند؛ تنظیم قدیمی ذخیره‌شده را به مدل جدید ببر
+if (/^gemini-[12]\./.test(settings.geminiModel || "")) { settings.geminiModel = DEFAULTS.geminiModel; save("hn:settings", settings); }
+let cache = load("hn:items", {ts:0, items:[], failed:[]});
+let tr = load("hn:tr", {});
+let tab = "all", query = "", busy = false, favPick = "";
+
+/* ---------- favourites ---------- */
+// متن را یکدست می‌کند: حروف کوچک، بدون اعراب لاتین (Pokémon = Pokemon)، علامت‌ها به فاصله
+const norm = s => " " + (s || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                                 .replace(/[^\p{L}\p{N}]+/gu, " ").trim() + " ";
+const favsOf = cat => (settings.favs && settings.favs[cat]) || [];
+const hasFavs = () => Object.values(settings.favs || {}).some(l => l.length);
+const favMode = () => settings.favOnly && hasFavs();
+// وقتی علاقه‌مندی هست، از هر فید عمیق‌تر می‌خوانیم تا خبرهای مرتبط کم نیاید
+const perFeed = () => hasFavs() ? 40 : 12;
+const maxItems = () => hasFavs() ? 240 : 90;
+let favMemo = new Map();
+function favOf(item){
+  if (item.fav) return item.fav;
+  if (favMemo.has(item.id)) return favMemo.get(item.id);
+  const text = norm(item.title + " " + item.summary);
+  let hit = "";
+  for (const f of favsOf(item.cat)){
+    if (f.terms.some(t => { const n = norm(t); return n.trim() && text.includes(n); })){ hit = f.name; break; }
+  }
+  favMemo.set(item.id, hit);
+  return hit;
+}
+// آیا این خبر با حالت فعلی علاقه‌مندی‌ها نشان داده می‌شود؟ (بدون در نظر گرفتن تب و جست‌وجو)
+function wanted(item){
+  if (!favMode()) return !item.search;   // نتیجه‌های جست‌وجو فقط در حالت علاقه‌مندی‌ها
+  if (favPick) return favPick === item.cat + ":" + favOf(item);
+  if (!favsOf(item.cat).length) return true;
+  const hit = favOf(item);
+  return !!hit;
+}
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? u : "";
+const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h*33 ^ s.charCodeAt(i)) >>> 0; return h.toString(36); };
+const rtf = new Intl.RelativeTimeFormat("fa", {numeric:"auto"});
+function ago(ts){
+  if (!ts) return "";
+  const d = (ts - Date.now())/1000, a = Math.abs(d);
+  if (a < 60) return "همین حالا";
+  if (a < 3600) return rtf.format(Math.round(d/60), "minute");
+  if (a < 86400) return rtf.format(Math.round(d/3600), "hour");
+  return rtf.format(Math.round(d/86400), "day");
+}
+
+/* ---------- header ---------- */
+function paintHeader(){
+  const h = new Date().getHours();
+  const g = h < 5 ? "شب بخیر" : h < 12 ? "صبح بخیر" : h < 16 ? "ظهر بخیر" : h < 20 ? "عصر بخیر" : "شب بخیر";
+  $("greet").firstChild.textContent = g;
+  try {
+    $("today").textContent = new Intl.DateTimeFormat("fa-IR-u-ca-persian",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date());
+  } catch { $("today").textContent = new Date().toLocaleDateString("fa-IR"); }
+}
+function applyTheme(){
+  if (settings.theme === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", settings.theme);
+}
+
+/* ---------- fetching ---------- */
+// corsproxy.io حذف شد: پلن رایگانش فقط روی localhost کار می‌کند و روی هاست واقعی 403 می‌دهد.
+const PROXIES = [
+  u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
+  u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u)
+];
+let proxyOrder = load("hn:proxy2", PROXIES.map((_, i) => i)).filter(i => PROXIES[i]);
+for (let i = 0; i < PROXIES.length; i++) if (!proxyOrder.includes(i)) proxyOrder.push(i);
+
+async function fetchText(url, opts = {}, ms = 15000){
+  const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
+  try {
+    const r = await fetch(url, {...opts, signal:c.signal});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return await r.text();
+  } finally { clearTimeout(t); }
+}
+// خروجی: رشته‌ی XML، یا {json} وقتی فقط rss2json جواب داده
+async function fetchFeed(url){
+  let err;
+  for (const i of proxyOrder){
+    try {
+      const txt = await fetchText(PROXIES[i](url));
+      if (txt && /<(rss|feed|rdf)/i.test(txt)){
+        if (proxyOrder[0] !== i){ proxyOrder = [i, ...proxyOrder.filter(x => x !== i)]; save("hn:proxy2", proxyOrder); }
+        return txt;
+      }
+      err = new Error("not a feed");
+    } catch(e){ err = e; }
+  }
+  // پشتیبان آخر: rss2json خودش فید را از سرورش می‌گیرد و هدر CORS دارد
+  try {
+    const d = JSON.parse(await fetchText("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url)));
+    if (d.status === "ok" && d.items && d.items.length) return {json:d};
+    err = new Error(d.message || "rss2json failed");
+  } catch(e){ err = e; }
+  throw err || new Error("failed");
+}
+
+function makeItem(feed, {title, link, html, img, date, source}){
+  const hdoc = new DOMParser().parseFromString(html || "", "text/html");
+  const text = (hdoc.body.textContent || "").replace(/\s+/g, " ").trim();
+  let summary = text.length > 260 ? text.slice(0, 260).replace(/\s+\S*$/, "") + "…" : text;
+  if (!img){ const i = hdoc.querySelector("img[src]"); if (i) img = i.getAttribute("src"); }
+  let t = new DOMParser().parseFromString(title || "", "text/html").body.textContent.trim();
+  const src = source || feed.name;
+  if (feed.search && source && t.endsWith(" - " + source)) t = t.slice(0, -(source.length + 3)).trim();
+  if (norm(summary).startsWith(norm(t).trimEnd())) summary = "";   // گوگل‌نیوز به‌جای خلاصه همان تیتر را می‌دهد
+  const it = {id: hash((safeUrl(link) || t) + feed.name), title:t, summary, link:safeUrl(link), img:safeUrl(img),
+          ts: isNaN(date) ? 0 : date, src, cat: feed.cat};
+  if (feed.search){ it.search = true; it.fav = feed.fav; }
+  return it;
+}
+
+function parseJsonFeed(d, feed){
+  return d.items.slice(0, feed.limit || perFeed()).map(it => {
+    const enc = it.enclosure || {};
+    const encImg = /image/i.test(enc.type || "") || /\.(jpe?g|png|webp|gif)/i.test(enc.link || "") ? enc.link : "";
+    // تاریخ rss2json به وقت UTC و به شکل "YYYY-MM-DD HH:MM:SS" است
+    const date = Date.parse((it.pubDate || "").replace(" ", "T") + "Z");
+    return makeItem(feed, {title:it.title, link:it.link, html:it.content || it.description, img:it.thumbnail || encImg, date});
+  }).filter(x => x.title);
+}
+
+function parseFeed(xml, feed){
+  const doc = new DOMParser().parseFromString(xml, "text/xml");
+  if (doc.getElementsByTagName("parsererror").length) throw new Error("bad xml");
+  let nodes = [...doc.getElementsByTagName("item")];
+  if (!nodes.length) nodes = [...doc.getElementsByTagName("entry")];
+  const lim = feed.limit || perFeed();
+  if (!feed.search) nodes = nodes.slice(0, lim);
+  const out = nodes.map(n => {
+    const get = tag => { const e = n.getElementsByTagName(tag)[0]; return e ? e.textContent.trim() : ""; };
+    const attr = (tag, a, test) => { for (const e of n.getElementsByTagName(tag)) { if (!test || test(e)) { const v = e.getAttribute(a); if (v) return v; } } return ""; };
+
+    let link = get("link");
+    if (!safeUrl(link)) link = attr("link", "href", e => !e.getAttribute("rel") || e.getAttribute("rel") === "alternate");
+    // لینک‌های بینگ از یک صفحه‌ی واسط رد می‌شوند؛ آدرس اصلی خبر را بیرون بکش
+    if (/bing\.com\/news\/apiclick/i.test(link)){ try { link = new URL(link).searchParams.get("url") || link; } catch {} }
+    const html = get("content:encoded") || get("description") || get("summary") || get("content");
+    let bimg = get("News:Image");
+    if (bimg) bimg = bimg.replace(/^http:/, "https:") + "&w=640&h=360&c=14";
+    const img = bimg || attr("enclosure", "url", e => /image/i.test(e.getAttribute("type") || "") || /\.(jpe?g|png|webp|gif)/i.test(e.getAttribute("url") || ""))
+             || attr("media:thumbnail", "url")
+             || attr("media:content", "url", e => (e.getAttribute("medium") || "image") === "image" || /image/i.test(e.getAttribute("type") || ""));
+    const date = Date.parse(get("pubDate") || get("published") || get("updated") || get("dc:date"));
+    return makeItem(feed, {title:get("title"), link, html, img, date, source: feed.search ? (get("source") || get("News:Source")) : ""});
+  }).filter(x => x.title);
+  if (feed.search) out.sort((a, b) => b.ts - a.ts);
+  return out.slice(0, lim);
+}
+
+// چند درخواست هم‌زمان، نه همه با هم (پراکسی‌های رایگان محدودیت سرعت دارند)
+async function pool(tasks, n){
+  const out = new Array(tasks.length); let i = 0;
+  const run = async () => { while (i < tasks.length){ const k = i++;
+    try { out[k] = {status:"fulfilled", value: await tasks[k]()}; } catch(e){ out[k] = {status:"rejected", reason:e}; } } };
+  await Promise.all(Array.from({length:Math.min(n, tasks.length)}, run));
+  return out;
+}
+
+async function refresh(){
+  if (busy) return;
+  busy = true; $("refreshBtn").classList.add("busy");
+  setStatus("در حال گرفتن خبرها…");
+  const feeds = settings.feeds.filter(f => f.on);
+  const searches = [];
+  for (const [cat, list] of Object.entries(settings.favs || {}))
+    if (feeds.some(f => f.cat === cat) || list.length) for (const fav of list) searches.push(...searchSources(fav, cat));
+  const all = [...feeds, ...searches];
+  const results = await pool(all.map(f => async () => {
+    const r = await fetchFeed(f.url);
+    return typeof r === "string" ? parseFeed(r, f) : parseJsonFeed(r.json, f);
+  }), 6);
+  const regular = [], found = [], failed = [];
+  results.forEach((r, i) => {
+    const f = all[i];
+    if (r.status === "fulfilled") (f.search ? found : regular).push(...r.value);
+    else if (!f.search) failed.push(f.name);
+  });
+  // جست‌وجویی که هر دو منبعش (گوگل و بینگ) شکست خوردند
+  const favFailed = [...new Set(searches.filter((f, i) => results[feeds.length + i].status !== "fulfilled").map(f => f.fav))]
+    .filter(name => !found.some(x => x.fav === name) && searches.filter(f => f.fav === name)
+    .every(f => results[feeds.length + searches.indexOf(f)].status !== "fulfilled"));
+  failed.push(...favFailed.map(n => "جست‌وجوی " + n));
+  if (regular.length || found.length){
+    const seen = new Set(), key = x => norm(x.title).trim();
+    const reg = regular.sort((a, b) => b.ts - a.ts).slice(0, maxItems());
+    const merged = [...reg, ...found].filter(x => { const k = key(x); if (seen.has(k) || seen.has(x.id)) return false; seen.add(k); seen.add(x.id); return true; })
+                                    .sort((a, b) => b.ts - a.ts);
+    cache = {ts: Date.now(), items: merged, failed};
+    favMemo = new Map();
+    save("hn:items", cache);
+  } else {
+    cache.failed = failed;
+  }
+  busy = false; $("refreshBtn").classList.remove("busy");
+  render(); translateAll();
+}
+
+/* ---------- translation ---------- */
+function saveTr(){
+  const keys = Object.keys(tr);
+  if (keys.length > 800){ const keep = new Set(cache.items.map(x => x.id)); for (const k of keys) if (!keep.has(k)) delete tr[k]; }
+  save("hn:tr", tr);
+}
+async function googleTranslate(item){
+  const q = item.title + "\n" + (item.summary || "-");
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=fa&dt=t&q=" + encodeURIComponent(q);
+  const data = JSON.parse(await fetchText(url, {}, 12000));
+  const out = data[0].map(s => s[0]).join("").split("\n");
+  return {t: out[0].trim(), s: item.summary ? out.slice(1).join(" ").trim() : ""};
+}
+async function geminiTranslate(batch){
+  const prompt = "این خبرهای گیم و انیمه را به فارسی روان و طبیعی ترجمه کن. اسم بازی‌ها، انیمه‌ها، شرکت‌ها، کنسول‌ها و شخصیت‌ها را به همان شکل انگلیسی نگه دار. " +
+    "فقط یک آرایه JSON برگردان به این شکل: [{\"i\":0,\"t\":\"تیتر\",\"s\":\"خلاصه\"}]\n\n" +
+    JSON.stringify(batch.map((x, i) => ({i, t:x.title, s:x.summary})));
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(settings.geminiModel || DEFAULTS.geminiModel) + ":generateContent";
+  const raw = await fetchText(url, {method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":settings.geminiKey},
+    body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{responseMimeType:"application/json", temperature:0.2}})}, 60000);
+  const txt = JSON.parse(raw).candidates[0].content.parts.map(p => p.text || "").join("").replace(/```json|```/g, "").trim();
+  const arr = JSON.parse(txt);
+  arr.forEach(r => { const it = batch[r.i]; if (it && r.t) tr[it.id] = {t:r.t, s:r.s || ""}; });
+}
+
+let translating = false;
+async function translateAll(){
+  if (translating) return;
+  translating = true;
+  const todo = cache.items.filter(x => wanted(x) && !tr[x.id]);
+  let failures = 0;
+  if (settings.engine === "gemini" && settings.geminiKey){
+    for (let i = 0; i < todo.length; i += 12){
+      const batch = todo.slice(i, i + 12);
+      try { await geminiTranslate(batch); }
+      catch { failures++; await googleBatch(batch); }
+      batch.forEach(x => updateCard(x.id));
+      saveTr();
+    }
+  } else {
+    failures += await googleBatch(todo);
+  }
+  translating = false;
+  saveTr(); setStatus(null, failures);
+}
+async function googleBatch(list){
+  let fails = 0, idx = 0;
+  const worker = async () => {
+    while (idx < list.length){
+      const item = list[idx++];
+      try { tr[item.id] = await googleTranslate(item); updateCard(item.id); }
+      catch { fails++; }
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  return fails;
+}
+
+/* ---------- rendering ---------- */
+const cards = new Map();
+
+function renderTabs(){
+  const used = new Set(settings.feeds.filter(f => f.on).map(f => f.cat));
+  const list = [["all","همه",""], ...Object.entries(CATS).filter(([k]) => used.has(k)).map(([k, v]) => [k, v.label, v.color])];
+  if (!list.some(([k]) => k === tab)) tab = "all";
+  document.body.dataset.tab = (tab === "game" || tab === "anime") ? tab : "all";
+  const box = $("tabs"); box.textContent = "";
+  for (const [k, label, color] of list){
+    const b = el("button", "tab", label);
+    b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(k === tab));
+    if (color) b.style.setProperty("--c", color);
+    b.onclick = () => { tab = k; renderTabs(); render(); };
+    box.append(b);
+  }
+}
+
+function fillCard(item, parts){
+  const t = tr[item.id];
+  parts.h.textContent = t ? t.t : item.title;
+  parts.h.dir = t ? "rtl" : "ltr";
+  parts.p.textContent = t ? t.s : item.summary;
+  parts.p.dir = t ? "rtl" : "ltr";
+  parts.p.hidden = !(t ? t.s : item.summary);
+  parts.body.classList.toggle("pending", !t);
+}
+
+function makeCard(item, lead){
+  const card = el("article", "card " + item.cat + (lead ? " lead" : ""));
+  card.style.setProperty("--c", (CATS[item.cat] || CATS.other).color);
+  if (item.img){
+    const th = el("div", "thumb"), im = el("img");
+    im.src = item.img; im.alt = ""; im.loading = lead ? "eager" : "lazy"; im.referrerPolicy = "no-referrer";
+    im.onerror = () => th.remove();
+    th.append(im); card.append(th);
+  }
+  const body = el("div", "body");
+  const meta = el("div", "meta");
+  meta.append(el("span", "src", item.src), el("span", "", ago(item.ts)));
+  const fv = favsOf(item.cat).length ? favOf(item) : "";
+  if (fv) meta.append(el("span", "fav", "★ " + fv));
+  const h = el("h2"), p = el("p");
+  const orig = el("div", "orig"); orig.hidden = true;
+  orig.append(el("strong", "", item.title));
+  if (item.summary) orig.append(el("div", "", item.summary));
+  const links = el("div", "links");
+  const tog = el("button", "", "متن اصلی"); tog.type = "button";
+  tog.onclick = () => { orig.hidden = !orig.hidden; tog.textContent = orig.hidden ? "متن اصلی" : "بستن متن اصلی"; };
+  links.append(tog);
+  if (item.link){
+    const a = el("a", "", "خواندن خبر"); a.href = item.link; a.target = "_blank"; a.rel = "noopener noreferrer";
+    links.append(a);
+  }
+  body.append(meta, h, p, orig, links);
+  card.append(body);
+  const parts = {h, p, body};
+  cards.set(item.id, {item, parts});
+  fillCard(item, parts);
+  return card;
+}
+
+function updateCard(id){ const c = cards.get(id); if (c) fillCard(c.item, c.parts); }
+
+function renderFavUI(){
+  const on = favMode();
+  $("favToggle").setAttribute("aria-pressed", String(on));
+  $("favToggleTxt").textContent = hasFavs() ? (on ? "فقط علاقه‌مندی‌ها" : "همه‌ی خبرها") : "تعیین علاقه‌مندی‌ها";
+  const bar = $("favbar"); bar.textContent = "";
+  const cats = tab === "all" ? Object.keys(CATS) : [tab];
+  const list = on ? cats.flatMap(c => favsOf(c).map(f => ({cat:c, name:f.name}))) : [];
+  if (favPick && !list.some(f => f.cat + ":" + f.name === favPick)) favPick = "";
+  bar.hidden = list.length < 2;
+  if (bar.hidden){ paintFavInfo(); return; }
+  const count = {};
+  for (const x of cache.items){ const h = favsOf(x.cat).length && favOf(x); if (h) count[x.cat + ":" + h] = (count[x.cat + ":" + h] || 0) + 1; }
+  const chip = (key, label, n, color) => {
+    const b = el("button", "chip" + (n === 0 ? " zero" : "")); b.type = "button";
+    b.setAttribute("aria-pressed", String(favPick === key));
+    if (color) b.style.setProperty("--c", color);
+    b.append(el("span", key ? "n" : "", label)); if (n) b.append(el("span", "c", n.toLocaleString("fa-IR")));
+    b.onclick = () => { favPick = favPick === key ? "" : key; render(); translateAll(); };
+    return b;
+  };
+  paintFavInfo();
+  bar.append(chip("", "همه‌ی علاقه‌مندی‌ها", null, ""));
+  for (const f of list){ const k = f.cat + ":" + f.name; bar.append(chip(k, f.name, count[k] || 0, CATS[f.cat].color)); }
+}
+
+function paintFavInfo(){
+  const box = $("favInfo"); box.textContent = "";
+  const [cat, ...rest] = favPick.split(":"); const name = rest.join(":");
+  const f = favPick && favsOf(cat).find(x => x.name === name);
+  box.hidden = !(f && (f.img || f.imdb || f.page));
+  if (box.hidden) return;
+  box.style.setProperty("--c", CATS[cat].color);
+  if (f.img){ const im = el("img"); im.src = f.img; im.alt = ""; im.referrerPolicy = "no-referrer"; box.append(im); }
+  const tx = el("div", "tx"); tx.append(el("strong", "", f.name));
+  if (f.terms.length > 1) tx.append(el("small", "", f.terms.slice(1).join(", ")));
+  const links = el("div", "links");
+  const link = (href, label) => { const a = el("a", "", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; links.append(a); };
+  if (f.imdb) link(f.imdb, f.imdbExact ? "صفحه‌ی IMDb" : "جست‌وجو در IMDb");
+  if (f.page) link(f.page, f.src === "anilist" ? "AniList" : "Wikidata");
+  tx.append(links); box.append(tx);
+}
+
+function render(){
+  renderFavUI();
+  const feed = $("feed"); feed.textContent = ""; cards.clear();
+  const q = query.toLowerCase();
+  const list = cache.items.filter(x => (tab === "all" || x.cat === tab) && wanted(x) &&
+    (!q || x.title.toLowerCase().includes(q) || (tr[x.id] && tr[x.id].t.toLowerCase().includes(q))));
+  if (!list.length){
+    const box = el("div", "empty");
+    if (busy) box.append("در حال گرفتن خبرها…");
+    else if (!cache.items.length) box.append("هنوز خبری نیامده. دکمه‌ی به‌روزرسانی را بزنید.");
+    else if (q) box.append("خبری با این جست‌وجو پیدا نشد.");
+    else if (favMode()){
+      box.append(el("div", "", "برای علاقه‌مندی‌هایت خبری پیدا نشد."));
+      const b = el("button", "btn ghost", "نمایش همه‌ی خبرها"); b.type = "button";
+      b.onclick = () => setFavOnly(false); box.append(b);
+    } else box.append("خبری نیست.");
+    feed.append(box);
+    setStatus();
+    return;
+  }
+  feed.append(makeCard(list[0], true));
+  const grid = el("div", "grid");
+  list.slice(1).forEach(x => grid.append(makeCard(x, false)));
+  feed.append(grid);
+  setStatus();
+}
+
+function setFavOnly(v){
+  settings.favOnly = v; favPick = ""; save("hn:settings", settings);
+  render(); translateAll();
+}
+
+function setStatus(msg, trFails = 0){
+  const s = $("status"); s.textContent = "";
+  if (msg){ s.textContent = msg; return; }
+  const parts = [];
+  if (cache.ts) parts.push(["", "آخرین به‌روزرسانی " + ago(cache.ts)]);
+  if (translating) parts.push(["", "در حال ترجمه…"]);
+  if (cache.failed && cache.failed.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + cache.failed.join("، ")]);
+  if (trFails) parts.push(["warn", "ترجمه‌ی " + trFails.toLocaleString("fa-IR") + " خبر انجام نشد"]);
+  parts.forEach(([c, t], i) => { if (i) s.append("، "); s.append(el("span", c, t)); });
+}
+
+/* ---------- settings ---------- */
+let draft;
+function openSettings(){
+  draft = JSON.parse(JSON.stringify(settings));
+  const sel = $("newCat"); sel.textContent = "";
+  for (const [k, v] of Object.entries(CATS)){ const o = el("option", "", v.label); o.value = k; sel.append(o); }
+  paintFeedList(); paintFavEdit();
+  document.querySelectorAll('input[name="engine"]').forEach(r => r.checked = r.value === draft.engine);
+  $("gKey").value = draft.geminiKey; $("gModel").value = draft.geminiModel; $("theme").value = draft.theme;
+  $("settings").showModal();
+}
+function paintFeedList(){
+  const box = $("feedList"); box.textContent = "";
+  draft.feeds.forEach((f, i) => {
+    const row = el("div", "feed-row");
+    row.style.setProperty("--c", (CATS[f.cat] || CATS.other).color);
+    const cb = el("input"); cb.type = "checkbox"; cb.checked = f.on; cb.setAttribute("aria-label", f.name);
+    cb.onchange = () => f.on = cb.checked;
+    const n = el("div", "n"); n.append(el("strong", "", f.name), el("span", "u", f.url));
+    const del = el("button", "del", "✕"); del.type = "button"; del.setAttribute("aria-label", "حذف " + f.name);
+    del.onclick = () => { draft.feeds.splice(i, 1); paintFeedList(); };
+    row.append(cb, el("span", "dot"), n, el("span", "hint", (CATS[f.cat] || CATS.other).label), del);
+    box.append(row);
+  });
+}
+let suggSeq = 0;
+function paintFavEdit(focusCat){
+  const box = $("favEdit"); box.textContent = "";
+  if (!draft.favs) draft.favs = {};
+  const used = new Set(draft.feeds.map(f => f.cat));
+  for (const [cat, info] of Object.entries(CATS)){
+    if (!used.has(cat) && !(draft.favs[cat] || []).length) continue;
+    const list = draft.favs[cat] || (draft.favs[cat] = []);
+    const wrap = el("div", "fav-cat"); wrap.style.setProperty("--c", info.color);
+    wrap.append(el("strong", "", info.label));
+    const tags = el("div", "fav-list");
+    list.forEach((f, i) => {
+      const t = el("span", "fav-tag");
+      if (f.img){ const im = el("img"); im.src = f.img; im.alt = ""; im.referrerPolicy = "no-referrer"; t.append(im); }
+      t.append(el("span", "", f.name));
+      if (f.terms.length > 1) t.append(el("small", "", f.terms.slice(1).join(", ")));
+      if (f.imdb){ const a = el("a", "", "IMDb"); a.href = f.imdb; a.target = "_blank"; a.rel = "noopener noreferrer"; t.append(a); }
+      const d = el("button", "del", "✕"); d.type = "button"; d.setAttribute("aria-label", "حذف " + f.name);
+      d.onclick = () => { list.splice(i, 1); paintFavEdit(cat); };
+      t.append(d); tags.append(t);
+    });
+
+    const row = el("div", "fav-add");
+    const inp = el("input"); inp.className = "ltr"; inp.placeholder = FAV_HINT[cat] || "";
+    inp.autocomplete = "off"; inp.spellcheck = false;
+    const lb = el("ul", "sugg"); lb.hidden = true; lb.id = "sugg-" + cat; lb.setAttribute("role", "listbox");
+    inp.setAttribute("role", "combobox"); inp.setAttribute("aria-autocomplete", "list");
+    inp.setAttribute("aria-controls", lb.id); inp.setAttribute("aria-expanded", "false");
+    inp.setAttribute("aria-label", "افزودن علاقه‌مندی " + info.label);
+    const add = el("button", "btn ghost", "افزودن"); add.type = "button";
+    row.append(inp, add, lb);
+    wrap.append(tags, row);
+    box.append(wrap);
+
+    let opts = [], active = -1, timer = 0;
+    const addFav = fav => {
+      if (!fav || !fav.terms.length) return;
+      if (list.some(f => (fav.id && f.id === fav.id) || norm(f.name) === norm(fav.name))) { paintFavEdit(cat); return; }
+      list.push(fav); paintFavEdit(cat);
+    };
+    const addTyped = () => {
+      const terms = inp.value.split(/[,،;]/).map(x => x.trim()).filter(Boolean);
+      if (!terms.length){ inp.focus(); return; }
+      addFav({name: terms[0], terms});
+    };
+    const close = () => { lb.hidden = true; inp.setAttribute("aria-expanded", "false"); inp.removeAttribute("aria-activedescendant"); active = -1; };
+    const highlight = i => {
+      active = i;
+      [...lb.children].forEach((li, k) => li.setAttribute("aria-selected", String(k === i)));
+      const li = lb.children[i];
+      if (li){ inp.setAttribute("aria-activedescendant", li.id); li.scrollIntoView({block:"nearest"}); }
+    };
+    const choose = async i => {
+      const o = opts[i]; if (!o) return;
+      if (o.free){ close(); addTyped(); return; }
+      lb.textContent = ""; lb.append(el("li", "msg", "در حال ثبت «" + o.name + "»…"));
+      let fav;
+      try { fav = await o.pick(); } catch { fav = {name:o.name, terms: buildTerms(o.name, [], inp.value)}; }
+      close(); addFav(fav);
+    };
+    const paint = (items, q, note) => {
+      lb.textContent = "";
+      opts = [...items, {free:true, name:q}];
+      if (note) lb.append(el("li", "msg", note));
+      opts.forEach((o, i) => {
+        const li = el("li", o.free ? "free" : ""); li.id = lb.id + "-" + i; li.setAttribute("role", "option");
+        if (o.free){
+          li.append(el("span", "pic", "+"), Object.assign(el("div", "tx"), {}));
+          li.lastChild.append(el("b", "", "افزودن «" + q + "» به همین شکل"), el("small", "", "بدون انتخاب از پیشنهادها"));
+        } else {
+          let pic;
+          if (o.img){ pic = el("img", "pic"); pic.src = o.img; pic.alt = ""; pic.referrerPolicy = "no-referrer"; }
+          else pic = el("span", "pic", (o.name || "?").trim().charAt(0).toUpperCase());
+          const tx = el("div", "tx"); tx.append(el("b", "", o.name)); if (o.sub) tx.append(el("small", "", o.sub));
+          li.append(pic, tx);
+        }
+        li.onmousedown = e => e.preventDefault();   // فوکوس از ورودی نرود
+        li.onclick = () => choose(i);
+        li.onmousemove = () => { if (active !== i) highlight(i); };
+        lb.append(li);
+      });
+      lb.hidden = false; inp.setAttribute("aria-expanded", "true");
+      highlight(items.length ? 0 : -1);
+    };
+    inp.oninput = () => {
+      clearTimeout(timer);
+      const q = inp.value.trim();
+      if (q.length < 2 || /[,،;]/.test(q)){ close(); return; }
+      timer = setTimeout(async () => {
+        const my = ++suggSeq;
+        lb.textContent = ""; lb.append(el("li", "msg", "در حال جست‌وجو…")); lb.hidden = false; inp.setAttribute("aria-expanded", "true");
+        let items = [], note = "";
+        try { items = await suggestFor(cat, q); if (!items.length) note = "چیزی پیدا نشد."; }
+        catch { note = "پیشنهادها در دسترس نیستند."; }
+        if (my !== suggSeq || inp.value.trim() !== q) return;
+        paint(items, q, note);
+      }, 300);
+    };
+    inp.onkeydown = e => {
+      const open = !lb.hidden && opts.length;
+      if (e.key === "ArrowDown" && open){ e.preventDefault(); highlight((active + 1) % opts.length); }
+      else if (e.key === "ArrowUp" && open){ e.preventDefault(); highlight((active - 1 + opts.length) % opts.length); }
+      else if (e.key === "Escape" && !lb.hidden){ e.preventDefault(); e.stopPropagation(); close(); }
+      else if (e.key === "Enter"){ e.preventDefault(); if (open && active >= 0) choose(active); else { close(); addTyped(); } }
+    };
+    inp.onblur = () => setTimeout(close, 150);
+    add.onclick = () => { if (!lb.hidden && active >= 0 && opts[active] && !opts[active].free) choose(active); else { close(); addTyped(); } };
+    if (focusCat === cat) setTimeout(() => inp.focus(), 0);
+  }
+}
+$("addFeed").onclick = () => {
+  const name = $("newName").value.trim(), url = $("newUrl").value.trim();
+  if (!name || !safeUrl(url)){ $("newUrl").focus(); return; }
+  draft.feeds.push({name, url, cat:$("newCat").value, on:true});
+  $("newName").value = ""; $("newUrl").value = ""; paintFeedList();
+};
+$("saveSettings").onclick = () => {
+  const r = document.querySelector('input[name="engine"]:checked');
+  draft.engine = r ? r.value : "google";
+  draft.geminiKey = $("gKey").value.trim(); draft.geminiModel = $("gModel").value.trim() || DEFAULTS.geminiModel;
+  draft.theme = $("theme").value;
+  for (const k of Object.keys(draft.favs)) if (!draft.favs[k].length) delete draft.favs[k];
+  const feedsChanged = JSON.stringify(draft.feeds) !== JSON.stringify(settings.feeds);
+  const favsChanged = JSON.stringify(draft.favs) !== JSON.stringify(settings.favs || {});
+  const depthBefore = perFeed();
+  if (favsChanged && !hasFavs()) draft.favOnly = true;   // اولین بار که علاقه‌مندی اضافه می‌شود، فیلتر روشن باشد
+  settings = draft; save("hn:settings", settings);
+  if (favsChanged){ favMemo = new Map(); favPick = ""; }
+  applyTheme(); renderTabs(); $("settings").close();
+  if (feedsChanged || favsChanged || perFeed() !== depthBefore) refresh(); else { render(); translateAll(); }
+};
+$("clearTr").onclick = () => { tr = {}; save("hn:tr", tr); render(); translateAll(); $("settings").close(); };
+$("closeSettings").onclick = () => $("settings").close();
+$("settings").addEventListener("cancel", e => { if (document.activeElement && document.activeElement.getAttribute("aria-expanded") === "true") e.preventDefault(); });
+$("settingsBtn").onclick = openSettings;
+$("favToggle").onclick = () => {
+  if (!hasFavs()){ openSettings(); $("favHead").scrollIntoView({block:"start"}); const i = $("favEdit").querySelector("input"); if (i) i.focus(); return; }
+  setFavOnly(!settings.favOnly);
+};
+$("refreshBtn").onclick = refresh;
+$("search").oninput = e => { query = e.target.value.trim(); render(); };
+
+/* ---------- petals ---------- */
+(() => {
+  const host = document.querySelector(".s-anime");
+  for (let i = 0; i < 14; i++){
+    const p = el("span", "petal");
+    const size = 8 + Math.random()*10;
+    p.style.cssText = `left:${Math.random()*110}%;width:${size}px;height:${size*.8}px;animation-duration:${9 + Math.random()*10}s;animation-delay:${-Math.random()*18}s;opacity:${.4 + Math.random()*.45}`;
+    host.append(p);
+  }
+})();
+
+/* ---------- start ---------- */
+applyTheme(); paintHeader(); renderTabs(); render();
+if (Date.now() - cache.ts > STALE_MS) refresh(); else translateAll();
+setInterval(() => { paintHeader(); if (!document.hidden && Date.now() - cache.ts > STALE_MS) refresh(); }, 60*1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - cache.ts > STALE_MS) refresh(); });
+})();
+</script>
+</body>
+</html>
