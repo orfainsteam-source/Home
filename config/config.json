@@ -1,5 +1,5 @@
 {
-  "updated": 1791585499836,
+  "updated": 1791585595179,
   "feeds": [
     {
       "name": "IGN",
@@ -66,18 +66,6 @@
         "imdbExact": true
       },
       {
-        "name": "The Last of Us",
-        "terms": [
-          "The Last of Us",
-          "Last of us"
-        ],
-        "src": "wikidata",
-        "id": "Q1986744",
-        "page": "https://www.wikidata.org/wiki/Q1986744",
-        "imdb": "https://www.imdb.com/title/tt2140553/",
-        "imdbExact": true
-      },
-      {
         "name": "Elden Ring",
         "terms": [
           "Elden Ring"
@@ -91,18 +79,6 @@
     ],
     "anime": [
       {
-        "name": "Tokyo Revengers",
-        "terms": [
-          "Tokyo Revengers"
-        ],
-        "src": "anilist",
-        "id": 120120,
-        "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx120120-cWDmnmeEntSe.jpg",
-        "page": "https://anilist.co/anime/120120",
-        "imdb": "https://www.imdb.com/title/tt13196080/",
-        "imdbExact": true
-      },
-      {
         "name": "Solo Leveling",
         "terms": [
           "Solo Leveling",
@@ -113,6 +89,18 @@
         "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx151807-it355ZgzquUd.png",
         "page": "https://anilist.co/anime/151807",
         "imdb": "https://www.imdb.com/title/tt21209876/",
+        "imdbExact": true
+      },
+      {
+        "name": "Tokyo Revengers",
+        "terms": [
+          "Tokyo Revengers"
+        ],
+        "src": "anilist",
+        "id": 120120,
+        "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx120120-cWDmnmeEntSe.jpg",
+        "page": "https://anilist.co/anime/120120",
+        "imdb": "https://www.imdb.com/title/tt13196080/",
         "imdbExact": true
       }
     ]
