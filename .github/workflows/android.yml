@@ -1,0 +1,34 @@
+# هر بار که پوشه‌ی android عوض شود، APK تازه ساخته و در Releases گذاشته می‌شود.
+name: Android app
+
+on:
+  push:
+    branches: [main]
+    paths: ["android/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: bash android/build.sh
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/build/home.apk home.apk
+          gh release create "v1.${{ github.run_number }}" home.apk \
+            --title "خانه‌ی من — نسخه‌ی 1.${{ github.run_number }}" \
+            --notes "اپ اندروید صفحه‌ی خانه‌ی من. فایل home.apk را دانلود و نصب کن." --latest
