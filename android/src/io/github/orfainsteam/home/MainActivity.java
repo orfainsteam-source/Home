@@ -33,6 +33,17 @@ public class MainActivity extends Activity {
     static final String IG_LOGIN = "https://www.instagram.com/accounts/login/";
     private WebView web;
     private boolean igMode = false;   // در حال ورود به اینستاگرام داخل اپ
+    private boolean ytMode = false;   // در حال ورود به حساب گوگل/یوتیوب داخل اپ
+    static final String YT_LOGIN = "https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fm.youtube.com%2F";
+
+    static boolean googleHost(String h) {
+        return h.endsWith("google.com") || h.endsWith("youtube.com") || h.endsWith("gstatic.com") || h.endsWith("googleusercontent.com")
+            || h.endsWith("youtube-nocookie.com") || h.endsWith("google.co") || h.equals("consent.youtube.com");
+    }
+    boolean ytLoggedIn() {
+        String c = CookieManager.getInstance().getCookie("https://www.youtube.com/");
+        return c != null && (c.contains("LOGIN_INFO=") || c.contains("SAPISID="));
+    }
     private boolean clearPending = false;
 
     /** پل بین صفحه و اپ: فقط برای خواندن پست‌های اینستاگرام با حساب واردشده‌ی کاربر */
@@ -47,6 +58,12 @@ public class MainActivity extends Activity {
         @JavascriptInterface public boolean igLoggedIn() {
             String c = CookieManager.getInstance().getCookie("https://www.instagram.com/");
             return c != null && c.contains("sessionid=");
+        }
+
+        @JavascriptInterface public boolean ytLoggedIn() { return MainActivity.this.ytLoggedIn(); }
+
+        @JavascriptInterface public void openYouTubeLogin() {
+            runOnUiThread(new Runnable() { public void run() { ytMode = true; web.loadUrl(YT_LOGIN); } });
         }
 
         @JavascriptInterface public void openInstagramLogin() {
@@ -100,7 +117,9 @@ public class MainActivity extends Activity {
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);          // localStorage: علاقه‌مندی‌ها، کلیدها، ترجمه‌ها
         s.setDatabaseEnabled(true);
-        s.setSupportMultipleWindows(false);    // لینک‌های target=_blank از shouldOverrideUrlLoading رد می‌شوند
+        s.setSupportMultipleWindows(false);
+        // گوگل ورود از داخل WebView را رد می‌کند؛ نشانه‌ی «wv» را از User-Agent برمی‌داریم
+        s.setUserAgentString(s.getUserAgentString().replace("; wv)", ")").replaceAll("Version/\\d+(\\.\\d+)* ", ""));    // لینک‌های target=_blank از shouldOverrideUrlLoading رد می‌شوند
         s.setMediaPlaybackRequiresUserGesture(true);
         s.setCacheMode(isOnline() ? WebSettings.LOAD_DEFAULT : WebSettings.LOAD_CACHE_ELSE_NETWORK);
         CookieManager.getInstance().setAcceptCookie(true);
@@ -113,6 +132,15 @@ public class MainActivity extends Activity {
                 Uri u = req.getUrl();
                 if (HOST.equalsIgnoreCase(u.getHost())) return false;   // خود صفحه، داخل اپ بماند
                 String h = u.getHost() == null ? "" : u.getHost();
+                // ورود به یوتیوب: «Sign in» داخل پلیر به گوگل می‌رود؛ به‌جای کروم، همین‌جا وارد شو
+                boolean signIn = h.startsWith("accounts.google.") || (h.endsWith("youtube.com") && String.valueOf(u.getPath()).contains("signin"));
+                if (signIn && !ytMode) ytMode = true;
+                if (ytMode && googleHost(h)) {
+                    if ((h.equals("m.youtube.com") || h.equals("www.youtube.com")) && ytLoggedIn() && !String.valueOf(u.getPath()).contains("signin")) {
+                        goHome(); return true;
+                    }
+                    return false;
+                }
                 // حین ورود به اینستاگرام، صفحه‌های اینستاگرام/فیسبوک داخل اپ باز شوند
                 if (igMode && (h.endsWith("instagram.com") || h.endsWith("facebook.com"))) {
                     // بعد از ورود، اینستاگرام به صفحه‌ی اصلی‌اش می‌رود؛ همان‌جا برگرد به خانه
@@ -130,6 +158,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                if (ytMode && url != null && (url.startsWith("https://m.youtube.com/") || url.startsWith("https://www.youtube.com/"))
+                    && !url.contains("signin") && ytLoggedIn()) { goHome(); return; }
                 if (clearPending && url != null && url.startsWith(HOME)) { clearPending = false; view.clearHistory(); }
                 if (igMode && url != null && url.startsWith("https://www.instagram.com/") && !url.contains("/accounts/")) {
                     String ck = CookieManager.getInstance().getCookie("https://www.instagram.com/");
@@ -177,7 +207,7 @@ public class MainActivity extends Activity {
     }
 
     private void goHome() {
-        igMode = false;
+        igMode = false; ytMode = false;
         CookieManager.getInstance().flush();
         clearPending = true;
         web.loadUrl(HOME);
@@ -197,7 +227,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (igMode) { goHome(); return; }
+        if (igMode || ytMode) { goHome(); return; }
         // اول پنجره‌ی باز (خواندن خبر یا تنظیمات) بسته شود، بعد صفحه‌ی قبل، بعد خروج
         web.evaluateJavascript(
             "(function(){var d=[].slice.call(document.querySelectorAll('dialog[open]')).pop();if(d){d.close();return 1}return 0})()",

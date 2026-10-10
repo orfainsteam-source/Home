@@ -202,7 +202,18 @@ dialog.player::backdrop{background:rgb(0 0 0 / .8)}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .player .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;background:#111;color:#eee}
 .player .bar a{color:#9ad;font-size:.85rem}
-details.srcs{border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-top:8px}
+details.srcs{border:1px solid var(--line);border-radius:12px;padding:0 12px;margin:10px 0 22px}
+details.srcs+details.srcs{margin-top:-10px}
+.dlg h4{margin-top:26px}
+details.fav-cat{border-inline-start:4px solid var(--c);margin:0 0 10px;padding:0 12px}
+details.fav-cat>summary{color:var(--c)}
+details.fav-cat .fav-add{margin:6px 0 4px}
+#favEdit{margin-bottom:22px}
+.player .bar .acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.player .yt-help{font-size:.82rem;color:var(--muted);padding:0 14px 12px}
+.player .yt-help button{font:inherit;color:var(--game);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
+.sched-row .acts{display:flex;gap:6px;flex:none}
+.sched-row .acts .icon-btn{padding:6px 10px;font-size:.82rem}
 details.srcs>summary{cursor:pointer;padding:12px 0;font-weight:700;list-style:none;display:flex;justify-content:space-between}
 details.srcs>summary::-webkit-details-marker{display:none}
 details.srcs>summary::after{content:"▾";color:var(--muted)}
@@ -250,8 +261,8 @@ dialog.reader::backdrop{background:var(--bg)}
 .chip.zero{opacity:.5}
 .chip .n{direction:ltr;unicode-bidi:isolate}
 .meta .fav{margin-inline-start:auto;color:var(--other);font-weight:700;direction:ltr;unicode-bidi:isolate}
-.fav-cat{border:1px solid var(--line);border-inline-start:4px solid var(--c);border-radius:10px;padding:10px 12px;margin-top:10px}
-.fav-cat>strong{color:var(--c)}
+div.fav-cat{border:1px solid var(--line);border-inline-start:4px solid var(--c);border-radius:10px;padding:10px 12px;margin-top:10px}
+div.fav-cat>strong{color:var(--c)}
 .fav-list{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .fav-list:empty{display:none}
 .fav-tag{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;
@@ -376,7 +387,6 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <div class="add">
       <select id="newType" class="full" aria-label="نوع منبع">
         <option value="tg">کانال تلگرام</option>
-        <option value="ig">پیج اینستاگرام</option>
         <option value="rss">سایت (RSS)</option>
       </select>
       <input id="newName" placeholder="اسم منبع (مثلاً زومجی)">
@@ -384,7 +394,23 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <input id="newUrl" class="full ltr" placeholder="@myzoomg" inputmode="url">
       <button class="btn ghost full" id="addFeed" type="button">افزودن منبع</button>
     </div>
-    <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>)، پیج اینستاگرام (مثلاً <span dir="ltr">@gamefa.official</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرام یا اینستاگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند. پیج‌های عمومی اینستاگرام بدون ورود خوانده می‌شوند.</p>
+    <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند. پیج‌های اینستاگرام بخش جدای خودشان را دارند.</p>
+    </details>
+
+    <details class="srcs" id="igSrcBox">
+    <summary id="igSum">پیج‌های اینستاگرام</summary>
+    <div id="igList"></div>
+    <div class="add">
+      <input id="igUrl" class="full ltr" placeholder="@fromsoftware_pr" inputmode="url">
+      <input id="igName" placeholder="اسم (اختیاری)">
+      <select id="igCat"></select>
+      <button class="btn ghost full" id="igAdd" type="button">افزودن پیج</button>
+    </div>
+    <p class="hint">لینک یا آیدی پیج‌های عمومی، مثل پیج رسمی بازی‌ها و استودیوها. پست‌هایشان بدون ورود به حساب خوانده می‌شود.</p>
+    <div id="igBox" hidden>
+      <div class="gh-state" id="igState"></div>
+      <button class="btn ghost" id="igLogin" type="button" style="margin-top:8px">ورود به اینستاگرام (فقط اگر پیجی خوانده نشد)</button>
+    </div>
     </details>
 
     <h4 id="favHead">علاقه‌مندی‌ها</h4>
@@ -397,13 +423,6 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <label for="ghToken">توکن GitHub</label>
       <input id="ghToken" class="ltr" type="password" autocomplete="off" placeholder="github_pat_...">
       <div class="gh-state" id="ghState"></div>
-    </div>
-
-    <h4>اینستاگرام</h4>
-    <p class="hint" id="igHint">پیج‌های عمومی اینستاگرام بدون ورود به حساب خوانده می‌شوند. فقط اگر پیجی خوانده نشد، داخل اپ اندروید می‌توانی وارد اینستاگرام شوی تا اپ خودش آن را بخواند.</p>
-    <div id="igBox" hidden>
-      <div class="gh-state" id="igState"></div>
-      <button class="btn ghost" id="igLogin" type="button" style="margin-top:8px">ورود به اینستاگرام</button>
     </div>
 
     <h4>خبرهای خارجی</h4>
@@ -456,8 +475,9 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
 
 <dialog id="player" class="player" aria-label="تریلر">
   <div class="frame" id="playerFrame"></div>
-  <div class="bar"><span id="playerTitle"></span><span><a id="playerYt" target="_blank" rel="noopener noreferrer">YouTube</a>
-    <button class="icon-btn" id="playerClose" type="button" style="margin-inline-start:10px">بستن</button></span></div>
+  <div class="bar"><span id="playerTitle"></span><span class="acts"><a id="playerYt" target="_blank" rel="noopener noreferrer">باز کردن در YouTube</a>
+    <button class="icon-btn" id="playerClose" type="button">بستن</button></span></div>
+  <div class="yt-help" id="ytHelp" hidden>اگر یوتیوب نوشت «Sign in to confirm you're not a bot»، یک بار <button type="button" id="ytLogin">داخل خود اپ وارد حساب یوتیوب شو</button>؛ بعد از آن تریلرها همین‌جا پخش می‌شوند.</div>
 </dialog>
 
 <dialog id="reader" class="reader" aria-label="خواندن خبر">
@@ -1409,7 +1429,12 @@ function paintSchedule(){
     const t = el("div", "t"); const b = el("b"); if (isFavGame(x.title)) b.append(el("span", "star", "★ ")); b.append(x.title);
     t.append(b, el("small", "", x.plat || "")); r.append(t);
     r.append(el("span", "d", x.ts ? (x.ts < now ? "منتشر شد · " : "") + faDate(x.ts) : (x.approx && !/unknown|tba/i.test(x.approx) ? x.approx : "نامشخص")));
-    const p = el("button", "icon-btn", x.yt ? "▶ تریلر" : "تریلر"); p.type = "button"; p.onclick = () => playTrailer(x); r.append(p);
+    // دو گزینه: «تریلر» در یوتیوب، «پخش» داخل خود اپ
+    const acts = el("div", "acts");
+    const yt = el("a", "icon-btn", "تریلر"); yt.href = ytUrl(x); yt.target = "_blank"; yt.rel = "noopener noreferrer";
+    acts.append(yt);
+    if (x.yt){ const p = el("button", "icon-btn", "▶ پخش"); p.type = "button"; p.onclick = () => playTrailer(x); acts.append(p); }
+    r.append(acts);
     return r;
   };
   for (const x of dated){
@@ -1419,14 +1444,18 @@ function paintSchedule(){
   }
   if (tba.length){ body.append(el("div", "sched-month", "تاریخ دقیق اعلام نشده")); for (const x of tba) body.append(row(x)); }
 }
+const ytUrl = x => x.yt ? "https://www.youtube.com/watch?v=" + x.yt
+                        : "https://www.youtube.com/results?search_query=" + encodeURIComponent(x.title + " official trailer");
 function playTrailer(x){
-  const search = "https://www.youtube.com/results?search_query=" + encodeURIComponent(x.title + " official trailer");
-  if (!x.yt){ window.open(search, "_blank", "noopener"); return; }
+  if (!x.yt){ window.open(ytUrl(x), "_blank", "noopener"); return; }
   $("playerTitle").textContent = x.title;
-  $("playerYt").href = "https://www.youtube.com/watch?v=" + x.yt;
+  $("playerYt").href = ytUrl(x);
+  $("ytHelp").hidden = !NATIVE;
   const f = $("playerFrame"); f.textContent = "";
   const ifr = el("iframe");
-  ifr.src = "https://www.youtube-nocookie.com/embed/" + x.yt + "?autoplay=1&rel=0&playsinline=1";
+  // داخل اپ با کوکی‌های یوتیوب (بعد از ورود، پیغام «ربات نیستم» دیگر نمی‌آید)
+  ifr.src = (NATIVE ? "https://www.youtube.com/embed/" : "https://www.youtube-nocookie.com/embed/") + x.yt +
+            "?autoplay=1&rel=0&playsinline=1&origin=" + encodeURIComponent(location.origin);
   ifr.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; ifr.allowFullscreen = true;
   ifr.referrerPolicy = "strict-origin-when-cross-origin"; ifr.title = x.title;
   f.append(ifr);
@@ -1435,6 +1464,7 @@ function playTrailer(x){
 $("relAll").onclick = () => { paintSchedule(); $("sched").showModal(); };
 $("schedClose").onclick = () => $("sched").close();
 $("playerClose").onclick = () => $("player").close();
+$("ytLogin").onclick = () => { if (NATIVE && NATIVE.openYouTubeLogin) { $("player").close(); NATIVE.openYouTubeLogin(); } };
 $("player").addEventListener("close", () => { $("playerFrame").textContent = ""; });
 
 /* ---------- reader ---------- */
@@ -1567,10 +1597,14 @@ function openSettings(){
   $("gKey").value = draft.geminiKey; $("gModel").value = draft.geminiModel; $("theme").value = draft.theme;
   $("settings").showModal();
 }
+const isIg = f => /instagram\.com/i.test(f.url);
 function paintFeedList(){
-  $("srcSum").textContent = "منابع خبر (" + draft.feeds.filter(f => f.on).length.toLocaleString("fa-IR") + " فعال از " + draft.feeds.length.toLocaleString("fa-IR") + ")";
+  const nonIg = draft.feeds.filter(f => !isIg(f));
+  $("srcSum").textContent = "منابع خبر (" + nonIg.filter(f => f.on).length.toLocaleString("fa-IR") + " فعال از " + nonIg.length.toLocaleString("fa-IR") + ")";
   const box = $("feedList"); box.textContent = "";
+  paintIgList();
   draft.feeds.forEach((f, i) => {
+    if (isIg(f)) return;
     const row = el("div", "feed-row");
     row.style.setProperty("--c", (CATS[f.cat] || CATS.other).color);
     const cb = el("input"); cb.type = "checkbox"; cb.checked = f.on; cb.setAttribute("aria-label", f.name);
@@ -1582,7 +1616,38 @@ function paintFeedList(){
     box.append(row);
   });
 }
+function paintIgList(){
+  const ig = draft.feeds.filter(isIg);
+  $("igSum").textContent = "پیج‌های اینستاگرام (" + ig.length.toLocaleString("fa-IR") + ")";
+  const box = $("igList"); box.textContent = "";
+  if (!$("igCat").options.length) for (const [k, c] of Object.entries(CATS)) $("igCat").append(new Option(c.label, k));
+  draft.feeds.forEach((f, i) => {
+    if (!isIg(f)) return;
+    const row = el("div", "feed-row"); row.style.setProperty("--c", (CATS[f.cat] || CATS.other).color);
+    const cb = el("input"); cb.type = "checkbox"; cb.checked = f.on; cb.setAttribute("aria-label", f.name); cb.onchange = () => f.on = cb.checked;
+    const nm = el("strong", "", f.name); nm.dir = "auto";
+    const n = el("div", "n"); n.append(nm, Object.assign(el("span", "u", "@" + (f.url.match(/instagram\.com\/([^/?#]+)/i) || [])[1]), {dir:"ltr"}));
+    const del = el("button", "del", "✕"); del.type = "button"; del.setAttribute("aria-label", "حذف " + f.name);
+    del.onclick = () => { draft.feeds.splice(i, 1); paintFeedList(); };
+    row.append(cb, el("span", "dot"), n, el("span", "hint", (CATS[f.cat] || CATS.other).label), del);
+    box.append(row);
+  });
+  if (!ig.length) box.append(el("p", "hint", "هنوز پیجی اضافه نشده."));
+}
+$("igAdd").onclick = () => {
+  const raw = $("igUrl").value.trim();
+  const user = (raw.match(/instagram\.com\/([A-Za-z0-9_.]+)/i) || raw.match(/^@?([A-Za-z0-9_.]{2,30})\/?$/) || [])[1];
+  if (!user || ["p","reel","reels","stories","explore"].includes(user.toLowerCase())){ $("igUrl").focus(); return; }
+  const url = "https://www.instagram.com/" + user + "/";
+  if (!draft.feeds.some(f => f.url.toLowerCase() === url.toLowerCase()))
+    draft.feeds.push({name: $("igName").value.trim() || "@" + user, url, cat: $("igCat").value || "game", on:true});
+  $("igUrl").value = ""; $("igName").value = "";
+  paintFeedList(); $("igSrcBox").open = true;
+};
+$("igUrl").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); $("igAdd").click(); } };
+
 let suggSeq = 0;
+const favOpen = new Set();
 function paintFavEdit(focusCat){
   const box = $("favEdit"); box.textContent = "";
   if (!draft.favs) draft.favs = {};
@@ -1590,8 +1655,10 @@ function paintFavEdit(focusCat){
   for (const [cat, info] of Object.entries(CATS)){
     if (!used.has(cat) && !["game","anime","animation","studio"].includes(cat) && !(draft.favs[cat] || []).length) continue;
     const list = draft.favs[cat] || (draft.favs[cat] = []);
-    const wrap = el("div", "fav-cat"); wrap.style.setProperty("--c", info.color);
-    wrap.append(el("strong", "", info.label));
+    const wrap = el("details", "srcs fav-cat"); wrap.style.setProperty("--c", info.color);
+    if (favOpen.has(cat) || focusCat === cat) wrap.open = true;
+    wrap.ontoggle = () => { if (wrap.open) favOpen.add(cat); else favOpen.delete(cat); };
+    wrap.append(el("summary", "", info.label + " (" + list.length.toLocaleString("fa-IR") + ")"));
     const tags = el("div", "fav-list");
     list.forEach((f, i) => {
       const t = el("span", "fav-tag");
