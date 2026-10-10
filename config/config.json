@@ -1,5 +1,5 @@
 {
-  "updated": 1791650640225,
+  "updated": 1791651497516,
   "foreign": true,
   "feeds": [
     {
@@ -360,6 +360,20 @@
         "imdb": "",
         "imdbExact": false,
         "bg": ""
+      }
+    ],
+    "animation": [
+      {
+        "name": "Rick and Morty",
+        "terms": [
+          "Rick and Morty"
+        ],
+        "src": "tvmaze",
+        "id": 216,
+        "img": "https://static.tvmaze.com/uploads/images/medium_portrait/626/1566363.jpg",
+        "page": "https://www.tvmaze.com/shows/216/rick-and-morty",
+        "imdb": "https://www.imdb.com/title/tt2861424/",
+        "imdbExact": true
       }
     ]
   }
