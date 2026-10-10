@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F4F2FF; --surface:#FFFFFF; --ink:#1F1A3D; --muted:#655F8C; --line:#E0DCF3;
@@ -337,6 +337,159 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
 }
 @media (prefers-reduced-motion:reduce){.icon-btn.busy svg,.s-game .floor{animation:none}.petal{display:none}.scene>div{transition:none}}
 </style>
+
+<style id="v2">
+/* ===== Dashboard v2: سفید، نارنجی، کارت‌های گرد، تیتر درشت ===== */
+:root{
+  --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F3F3F5; --ink:#141416; --muted:#86868F; --line:#ECECF0;
+  --accent:#FF5A1F; --accent-ink:#FFFFFF; --glass:rgb(255 255 255 / .9);
+  --shadow:0 10px 30px rgb(20 20 22 / .08);
+  --display:"Vazirmatn",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0F0F12; --surface:#19191E; --soft:#222228; --ink:#F3F3F6; --muted:#9C9CA6; --line:#2A2A31; --glass:rgb(25 25 30 / .9);
+  --shadow:0 10px 30px rgb(0 0 0 / .35);
+}}
+:root[data-theme="dark"]{
+  --bg:#0F0F12; --surface:#19191E; --soft:#222228; --ink:#F3F3F6; --muted:#9C9CA6; --line:#2A2A31; --glass:rgb(25 25 30 / .9);
+  --shadow:0 10px 30px rgb(0 0 0 / .35);
+}
+body{background:var(--bg)}
+.scene .s-game,.scene .s-anime{display:none}
+.wrap{max-width:760px;padding:14px 18px 120px}
+
+/* لوگو: همان D، با رنگ‌های تازه */
+.logo{display:inline-block;width:26px;height:26px;position:relative;flex:none}
+.logo::before{content:"";position:absolute;inset:3px auto 3px 3px;width:6px;border-radius:4px;background:var(--ink)}
+.logo::after{content:"";position:absolute;top:3px;bottom:3px;left:12px;width:10px;border-radius:0 20px 20px 0;background:var(--accent)}
+[dir="rtl"] .logo{transform:scaleX(1)}
+.logo.big{width:44px;height:44px}
+.logo.big::before{width:10px;inset:5px auto 5px 5px}
+.logo.big::after{left:20px;width:18px;top:5px;bottom:5px}
+
+header.top{display:flex;align-items:center;justify-content:space-between;margin:0 0 6px;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:1.25rem;color:var(--accent);direction:ltr;letter-spacing:.2px}
+.icon-btn.round{width:42px;height:42px;background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.search-bar{margin:6px 0 4px}
+.search-bar[hidden]{display:none}
+.search-bar .search{width:100%;border-radius:999px;background:var(--soft);border:1px solid transparent;padding:12px 18px;font:inherit;color:var(--ink)}
+.hello{margin:18px 0 18px}
+.greet-line{color:var(--muted);font-size:.9rem;display:flex;gap:8px;align-items:center}
+.greet-line .sep{width:4px;height:4px;border-radius:50%;background:var(--muted)}
+.headline{font-family:var(--display);font-weight:900;font-size:clamp(2.6rem,11vw,3.6rem);line-height:1.08;margin:6px 0 0;letter-spacing:-.5px;color:var(--ink)}
+.headline .mark{display:none}
+
+/* دسته‌ها */
+.toolbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -18px 6px;padding:2px 18px 6px;gap:8px}
+.toolbar::-webkit-scrollbar{display:none}
+.tabs{flex-wrap:nowrap;gap:8px}
+.tab{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 18px;font-weight:600;font-size:.92rem;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.fav-toggle{flex:none;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;white-space:nowrap;font-weight:600}
+.fav-toggle[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.status{font-size:.82rem;color:var(--muted);margin:2px 0 6px}
+
+/* بخش‌ها */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 12px}
+.sec-head h3{margin:0;font-weight:800;font-size:1.12rem}
+.sec-head button{border:0;background:none;color:var(--accent);font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+
+/* کاروسل تازه‌ترین‌ها */
+.carousel{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:2px 18px 14px;scrollbar-width:none}
+.carousel::-webkit-scrollbar{display:none}
+.hcard{flex:none;width:min(78vw,320px);scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:10px;box-shadow:var(--shadow);cursor:pointer}
+.hcard .im{position:relative;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:var(--soft)}
+.hcard .im img{width:100%;height:100%;object-fit:cover;display:block}
+.hcard .chip{position:absolute;inset:10px 10px auto auto;background:var(--glass);color:var(--ink);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.hcard .chip.fav{background:var(--accent);color:var(--accent-ink)}
+.hcard h4{margin:10px 4px 6px;font-size:1rem;font-weight:800;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.srcrow{display:flex;align-items:center;gap:7px;font-size:.82rem;font-weight:700;margin:8px 4px 0}
+.srcrow .fi{width:20px;height:20px;border-radius:6px;object-fit:cover;background:var(--soft);flex:none}
+.srcrow .fi.txt{display:grid;place-items:center;color:#fff;font-size:.7rem;background:var(--c,var(--accent))}
+.srcrow .ok{width:15px;height:15px;flex:none}
+.metarow{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem;margin:0 4px 2px}
+
+/* فهرست همه‌ی خبرها */
+.nlist{display:flex;flex-direction:column}
+.nrow{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;align-items:center}
+.nrow:last-child{border-bottom:0}
+.nrow .im{width:104px;height:84px;border-radius:16px;overflow:hidden;flex:none;background:var(--soft)}
+.nrow .im img{width:100%;height:100%;object-fit:cover;display:block}
+.im.ph{display:grid;place-items:center;background:linear-gradient(135deg,var(--c,var(--accent)),color-mix(in srgb,var(--c,var(--accent)) 45%,#000));color:#fff;font-weight:800;text-align:center;padding:8px}
+.nrow .tx{min-width:0;flex:1}
+.nrow h4{margin:0 0 6px;font-size:.95rem;font-weight:700;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nrow .srcrow{margin:0}
+.nrow .t{color:var(--muted);font-weight:500;margin-inline-start:auto;font-size:.76rem;white-space:nowrap}
+.nrow .star{color:var(--accent);font-weight:800}
+.more-btn{display:block;margin:14px auto 0;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:10px 22px;font:inherit;font-weight:700;cursor:pointer}
+.empty{background:var(--soft);border-radius:20px;padding:40px 20px}
+
+/* تقویم */
+.rel{margin:8px 0 0}
+.rel-head{display:none}
+.rc .cv{border-radius:18px;box-shadow:none}
+.rc .when{background:var(--accent);color:var(--accent-ink)}
+
+/* منوی پایین */
+.bottom-nav{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:6px;padding:7px;border-radius:999px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 34px rgb(20 20 22 / .16);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.bottom-nav button{display:flex;align-items:center;gap:6px;border:0;background:none;color:var(--ink);height:46px;min-width:46px;padding:0 12px;border-radius:999px;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
+.bottom-nav button svg{width:22px;height:22px}
+.bottom-nav button span{display:none}
+.bottom-nav button.on{background:var(--accent);color:var(--accent-ink);padding:0 16px}
+.bottom-nav button.on span{display:inline}
+.bottom-nav button:focus-visible,.tab:focus-visible,.hcard:focus-visible,.nrow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* صفحه‌ی شروع */
+.intro{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
+.intro[hidden]{display:none}
+.intro-art{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:4px;overflow:hidden;
+  border-radius:0 0 50% 50% / 0 0 14% 14%;background:var(--soft)}
+.intro-art div{background:center/cover no-repeat var(--soft)}
+.intro-body{padding:22px 26px calc(26px + env(safe-area-inset-bottom,0px));text-align:center}
+.intro-body h2{font-weight:900;font-size:1.65rem;line-height:1.45;margin:12px 0 8px}
+.intro-body p{color:var(--muted);margin:0 0 22px;font-size:.92rem}
+.cta{width:100%;border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:800;font-size:1rem;padding:15px;cursor:pointer}
+
+/* صفحه‌ی خبر */
+dialog.reader{background:var(--bg)}
+.reader .r-bg{display:none}
+.r-hero-wrap{position:relative;min-height:46vh;background:#222;display:flex;flex-direction:column;justify-content:flex-end}
+.r-hero-wrap .r-hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0;margin:0;max-height:none;box-shadow:none}
+.r-hero-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgb(0 0 0 / .35) 0,transparent 30%,transparent 45%,rgb(0 0 0 / .78) 100%)}
+.reader .r-top{position:absolute;inset:calc(12px + env(safe-area-inset-top,0px)) 14px auto 14px;z-index:2;display:flex;gap:8px;padding:0;background:none}
+.reader .r-top .grow{flex:1}
+.icon-btn.glass{background:rgb(255 255 255 / .22);border:0;color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.icon-btn.glass[aria-pressed="true"]{background:var(--accent)}
+.icon-btn.glass[aria-pressed="true"] svg{fill:currentColor}
+.r-head{position:relative;z-index:1;padding:0 20px 34px;color:#fff;max-width:760px;width:100%;margin:0 auto}
+.r-head h2{font-family:var(--display);font-weight:900;font-size:clamp(1.45rem,5.6vw,2.1rem);line-height:1.45;margin:0 0 6px;color:#fff}
+.r-head .r-meta{color:rgb(255 255 255 / .85);margin:0;font-size:.85rem}
+.r-head .r-meta .src{color:#fff}
+.r-sheet{position:relative;margin:-20px auto 0;background:var(--bg);border-radius:24px 24px 0 0;padding:18px 20px calc(60px + env(safe-area-inset-bottom,0px));max-width:760px}
+.r-src{display:flex;align-items:center;gap:10px;font-weight:800;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.r-src .fi{width:30px;height:30px;border-radius:9px;object-fit:cover;background:var(--soft)}
+.r-src .fi.txt{display:grid;place-items:center;color:#fff;background:var(--accent);font-size:.85rem}
+.r-src .t{margin-inline-start:auto;color:var(--muted);font-weight:500;font-size:.85rem}
+.r-orig{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:.82rem;cursor:pointer;margin-bottom:10px}
+.r-orig[hidden]{display:none}
+.r-body{font-size:1.04rem;line-height:2.05}
+.r-foot a.btn{background:var(--accent);color:var(--accent-ink);border:0}
+
+/* تنظیمات */
+dialog#settings{border:0;border-radius:24px;background:var(--bg)}
+#settings .dlg h3{font-weight:900;font-size:1.5rem}
+#settings .dlg h4{font-weight:800;font-size:1rem}
+details.srcs{background:var(--surface);border-color:var(--line);border-radius:18px}
+#settings .btn{border-radius:999px}
+#settings .btn:not(.ghost){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:640px){
+  dialog#settings{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;border-radius:0}
+  #settings .dlg{max-height:100dvh;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(30px + env(safe-area-inset-bottom,0px))}
+}
+@media (prefers-reduced-motion:reduce){ .carousel{scroll-behavior:auto} }
+</style>
 </head>
 <body data-tab="all">
 <div class="user-bg" id="userBg" aria-hidden="true"></div>
@@ -348,22 +501,26 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
   <div class="s-anime"><div class="speed"></div><div class="dots"></div></div>
 </div>
 <div class="wrap">
-  <header>
-    <div>
-      <h1 id="greet">سلام<span class="mark" aria-hidden="true"></span></h1>
-      <div class="today" id="today"></div>
-    </div>
+  <header class="top">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span>Dashboard</span></div>
     <div class="actions">
+      <button class="icon-btn round" id="searchBtn" type="button" title="جست‌وجو" aria-expanded="false" aria-controls="searchBar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span class="sr">جست‌وجو</span>
+      </button>
       <button class="icon-btn round" id="refreshBtn" type="button" title="به‌روزرسانی">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
         <span class="sr">به‌روزرسانی</span>
       </button>
-      <button class="icon-btn round" id="settingsBtn" type="button" title="تنظیمات">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
-        <span class="sr">تنظیمات</span>
-      </button>
     </div>
   </header>
+  <div class="search-bar" id="searchBar" hidden>
+    <input class="search" id="search" type="search" placeholder="جست‌وجو در خبرها">
+  </div>
+  <div class="hello">
+    <div class="greet-line"><span id="greet">سلام</span><span class="sep" aria-hidden="true"></span><span id="today"></span></div>
+    <h1 class="headline">امروز<br>چه خبر؟</h1>
+  </div>
 
   <div class="toolbar">
     <div class="tabs" id="tabs" role="tablist"></div>
@@ -371,7 +528,6 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>
       <span id="favToggleTxt">علاقه‌مندی‌ها</span>
     </button>
-    <input class="search" id="search" type="search" placeholder="جست‌وجو در خبرها">
   </div>
   <div class="favdrop" id="favbar" hidden>
     <button class="fd-btn" id="fdBtn" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
@@ -387,6 +543,41 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <div class="rel-row" id="relRow"></div>
   </section>
   <main id="feed"></main>
+  <main id="savedView" hidden>
+    <div class="sec-head"><h3>ذخیره‌شده‌ها</h3></div>
+    <div id="savedList"></div>
+  </main>
+</div>
+
+<nav class="bottom-nav" aria-label="منوی اصلی">
+  <button type="button" class="on" id="navHome" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>
+    <span>خانه</span>
+  </button>
+  <button type="button" id="navCal" title="تقویم و تریلرها">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/></svg>
+    <span>تریلرها</span>
+  </button>
+  <button type="button" id="navSaved" title="ذخیره‌شده‌ها">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4z"/></svg>
+    <span>ذخیره‌ها</span>
+  </button>
+  <button type="button" id="settingsBtn" title="تنظیمات">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+    <span>تنظیمات</span>
+  </button>
+</nav>
+
+<div class="intro" id="intro" hidden>
+  <div class="intro-art" id="introArt"></div>
+  <div class="intro-body">
+    <span class="logo big" aria-hidden="true"></span>
+    <h2>خبرهای گیم و انیمه،<br>همین که منتشر شد.</h2>
+    <p>از ویجیاتو، زومجی، گیمفا و کانال‌های انیمه، به فارسی و یک‌جا.</p>
+    <button class="cta" id="introGo" type="button">شروع کنیم</button>
+  </div>
+</div>
+<div hidden>
 </div>
 
 <dialog id="settings">
@@ -505,17 +696,31 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
 
 <dialog id="reader" class="reader" aria-label="خواندن خبر">
   <div class="r-bg" id="rBg"></div>
-  <div class="r-in">
-    <div class="r-top">
-      <button class="icon-btn round" id="rClose" type="button" title="بستن">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        <span class="sr">بستن</span>
-      </button>
-      <button class="icon-btn" id="rOrig" type="button">نمایش متن اصلی</button>
-    </div>
-    <div class="r-meta" id="rMeta"></div>
-    <h2 id="rTitle"></h2>
+  <div class="r-hero-wrap">
     <img class="r-hero" id="rHero" alt="" referrerpolicy="no-referrer">
+    <div class="r-top">
+      <button class="icon-btn round glass" id="rClose" type="button" title="بازگشت">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        <span class="sr">بازگشت</span>
+      </button>
+      <span class="grow"></span>
+      <button class="icon-btn round glass" id="rSave" type="button" title="ذخیره" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4z"/></svg>
+        <span class="sr">ذخیره</span>
+      </button>
+      <button class="icon-btn round glass" id="rShare" type="button" title="اشتراک‌گذاری">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.9l7.6-4.6M8.2 13.1l7.6 4.6"/></svg>
+        <span class="sr">اشتراک‌گذاری</span>
+      </button>
+    </div>
+    <div class="r-head">
+      <h2 id="rTitle"></h2>
+      <div class="r-meta" id="rMeta"></div>
+    </div>
+  </div>
+  <div class="r-sheet">
+    <div class="r-src" id="rSrc"></div>
+    <button class="r-orig" id="rOrig" type="button">نمایش متن اصلی</button>
     <div class="r-body" id="rBody"></div>
     <div class="r-foot" id="rFoot"></div>
   </div>
@@ -1154,7 +1359,11 @@ function makeCard(item, lead){
   return card;
 }
 
-function updateCard(id){ const c = cards.get(id); if (c) fillCard(c.item, c.parts); }
+function updateCard(id){
+  const c = cards.get(id); if (!c) return;
+  if (c.parts.v2){ const t = titleOf(c.item); c.parts.h.textContent = t.text; c.parts.h.dir = t.dir; }
+  else fillCard(c.item, c.parts);
+}
 
 const favThumb = (cat, f) => f.img || f.bg || "";
 let fdOpen = false;
@@ -1307,6 +1516,7 @@ function favBackdrop(list){
 }
 
 function render(){
+  if (REL.parentNode === $("feed")) $("feed").before(REL);
   renderFavUI(); paintReleases();
   const feed = $("feed"); feed.textContent = ""; cards.clear();
   const q = query.toLowerCase();
@@ -1334,12 +1544,95 @@ function render(){
     return;
   }
   const hero = favBackdrop(list);
-  setBackdrop(hero || (list.find(x => x.img) || {}).img, !!hero);
-  feed.append(makeCard(list[0], true));
-  const grid = el("div", "grid");
-  list.slice(1).forEach(x => grid.append(makeCard(x, false)));
-  feed.append(grid);
+  setBackdrop(hero ? hero : null, !!hero);
+  // تازه‌ترین‌ها: کاروسل افقی
+  const top = list.slice(0, 8);
+  feed.append(secHead(favMode() ? "تازه‌ترین‌های علاقه‌مندی‌ها" : "تازه‌ترین‌ها", "همه", () => $("allHead").scrollIntoView({behavior:"smooth", block:"start"})));
+  const car = el("div", "carousel");
+  top.forEach(x => car.append(heroCard(x)));
+  feed.append(car);
+  // تقویم بازی‌ها
+  if (!REL.hidden){ feed.append(secHead("تقویم بازی‌ها", "همه", () => $("relAll").click())); feed.append(REL); }
+  // همه‌ی خبرها: فهرست
+  const ah = secHead("همه‌ی خبرها"); ah.id = "allHead"; feed.append(ah);
+  const nl = el("div", "nlist"); feed.append(nl);
+  const rest = list.slice(top.length);
+  let shown = 0;
+  const more = () => {
+    rest.slice(shown, shown + 30).forEach(x => nl.append(rowCard(x)));
+    shown += 30;
+    mb.hidden = shown >= rest.length;
+  };
+  const mb = el("button", "more-btn", "خبرهای بیشتر"); mb.type = "button"; mb.onclick = more;
+  feed.append(mb); more();
   setStatus();
+}
+
+/* ---------- v2 cards ---------- */
+const REL = document.getElementById("rel");
+function secHead(title, action, fn){
+  const h = el("div", "sec-head"); h.append(el("h3", "", title));
+  if (action){ const b = el("button", "", action); b.type = "button"; b.onclick = fn; h.append(b); }
+  return h;
+}
+const VERIFIED = '<svg class="ok" viewBox="0 0 24 24" aria-label="منبع ثبت‌شده"><path fill="#1DA1F2" d="M12 2l2.4 1.8 3-.2.9 2.9 2.5 1.7-.9 2.9.9 2.9-2.5 1.7-.9 2.9-3-.2L12 22l-2.4-1.8-3 .2-.9-2.9L3.2 15.8l.9-2.9-.9-2.9 2.5-1.7.9-2.9 3 .2z"/><path d="M8 12.5l2.6 2.5L16 9.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function srcIcon(item, cls){
+  let host = ""; try { host = new URL(item.link).hostname; } catch {}
+  const letter = el("span", "fi txt " + (cls || ""), (item.src || "?").trim().charAt(0));
+  letter.style.setProperty("--c", (CATS[item.cat] || CATS.other).color);
+  if (!host || /t\.me$|telegram/.test(host)) return letter;
+  const im = el("img", "fi " + (cls || "")); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+  im.src = "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(host);
+  im.onerror = () => im.replaceWith(letter);
+  return im;
+}
+function srcRow(item){
+  const r = el("div", "srcrow"); r.append(srcIcon(item), el("span", "", item.src));
+  if (!item.search) r.insertAdjacentHTML("beforeend", VERIFIED);
+  return r;
+}
+function cardImg(item, box){
+  const im = el("img"); im.src = item.img; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+  im.onerror = () => {
+    const f = favBackdropFor(item);
+    if (f && im.src !== f) { im.src = f; return; }
+    // عکس باز نشد: کاور ساده با رنگ دسته و اسم منبع
+    im.remove(); box.classList.add("ph"); box.style.setProperty("--c", (CATS[item.cat] || CATS.other).color); box.append(el("span", "", item.src));
+  };
+  box.append(im);
+}
+function titleOf(item){ const t = tr[item.id] || (isFa(item.title) ? {t:item.title} : null); return {text: t ? t.t : item.title, dir: t ? "rtl" : "ltr"}; }
+function heroCard(item){
+  const c = el("article", "hcard"); c.tabIndex = 0; c.setAttribute("role", "link");
+  const box = el("div", "im"); cardImg(item, box);
+  const fv = favOf(item);
+  box.append(el("span", "chip" + (fv ? " fav" : ""), fv ? "★ " + fv : (CATS[item.cat] || CATS.other).label));
+  const t = titleOf(item), h = el("h4", "", t.text); h.dir = t.dir;
+  const m = el("div", "metarow"); m.append(el("span", "", (CATS[favCatOf(item)] || CATS.other).label), el("span", "", ago(item.ts)));
+  c.append(box, srcRow(item), h, m);
+  c.onclick = () => openReader(item);
+  c.onkeydown = e => { if (e.key === "Enter") openReader(item); };
+  cards.set(item.id, {item, parts:{h, v2:true}});
+  return c;
+}
+function rowCard(item){
+  const c = el("article", "nrow"); c.tabIndex = 0; c.setAttribute("role", "link");
+  const box = el("div", "im"); cardImg(item, box);
+  const tx = el("div", "tx");
+  const t = titleOf(item), h = el("h4", "", t.text); h.dir = t.dir;
+  const sr = srcRow(item);
+  const fv = favOf(item); if (fv) sr.append(el("span", "star", "★"));
+  sr.append(el("span", "t", ago(item.ts)));
+  tx.append(h, sr); c.append(box, tx);
+  c.onclick = () => openReader(item);
+  c.onkeydown = e => { if (e.key === "Enter") openReader(item); };
+  cards.set(item.id, {item, parts:{h, v2:true}});
+  return c;
+}
+function favBackdropFor(item){
+  const fv = favOf(item); if (!fv) return "";
+  const f = favsOf(favCatOf(item)).find(x => x.name === fv);
+  return f ? (f.bg || f.img || "") : "";
 }
 
 function setFavOnly(v){
@@ -1354,7 +1647,7 @@ function setStatus(msg, trFails = 0){
   if (cache.ts) parts.push(["", "آخرین جمع‌آوری " + ago(cache.ts)]);
   if (translating) parts.push(["", "در حال ترجمه…"]);
   // پیج‌های اینستاگرامی که سرور نتوانست بخواند، داخل اپ اندروید از راه خود گوشی خوانده می‌شوند
-  const igNames = new Set(settings.feeds.filter(f => /instagram\.com/i.test(f.url)).map(f => f.name));
+  const igNames = new Set([...settings.feeds, ...((remoteCfg && remoteCfg.feeds) || [])].filter(f => /instagram\.com/i.test(f.url)).map(f => f.name));
   const failedNow = (cache.failed || []).filter(n => !igNames.has(n));
   const igOnlyApp = (cache.failed || []).filter(n => igNames.has(n));
   if (failedNow.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + failedNow.join("، ")]);
@@ -1599,6 +1892,58 @@ $("bgFile").onchange = () => {
   im.src = url;
 };
 
+/* ---------- saved items ---------- */
+let saved = load("hn:saved", []), readerItem = null;
+const isSaved = it => saved.some(x => x.id === it.id);
+function paintSave(){ const on = !!readerItem && isSaved(readerItem); $("rSave").setAttribute("aria-pressed", String(on)); $("rSave").title = on ? "حذف از ذخیره‌ها" : "ذخیره"; }
+$("rSave").onclick = () => {
+  if (!readerItem) return;
+  if (isSaved(readerItem)) saved = saved.filter(x => x.id !== readerItem.id);
+  else saved.unshift({...readerItem, savedAt: Date.now()});
+  saved = saved.slice(0, 150); save("hn:saved", saved); paintSave();
+  if (view === "saved") paintSaved();
+};
+$("rShare").onclick = async () => {
+  if (!readerItem) return;
+  const t = titleOf(readerItem).text, url = readerItem.link || location.href;
+  try { if (navigator.share) { await navigator.share({title:t, url}); return; } } catch { return; }
+  try { await navigator.clipboard.writeText(t + "\n" + url); $("rShare").title = "لینک کپی شد"; } catch {}
+};
+function paintSaved(){
+  const box = $("savedList"); box.textContent = "";
+  if (!saved.length){ box.append(el("div", "empty", "هنوز خبری ذخیره نکرده‌ای. داخل هر خبر، آیکون نشان را بزن.")); return; }
+  const nl = el("div", "nlist"); saved.forEach(x => nl.append(rowCard(x))); box.append(nl);
+}
+
+/* ---------- bottom navigation ---------- */
+let view = "home";
+function setView(v){
+  view = v;
+  $("feed").hidden = v !== "home"; $("savedView").hidden = v !== "saved";
+  for (const el2 of document.querySelectorAll(".toolbar, .favdrop, .fav-info, .hello")) el2.style.display = v === "home" ? "" : "none";
+  for (const [id, k] of [["navHome","home"],["navSaved","saved"]]){ $(id).classList.toggle("on", v === k); if (v === k) $(id).setAttribute("aria-current", "page"); else $(id).removeAttribute("aria-current"); }
+  if (v === "saved") paintSaved();
+  window.scrollTo({top:0});
+}
+$("navHome").onclick = () => { if (view === "home") window.scrollTo({top:0, behavior:"smooth"}); setView("home"); };
+$("navSaved").onclick = () => setView("saved");
+$("navCal").onclick = () => { paintSchedule(); $("sched").showModal(); };
+$("searchBtn").onclick = () => {
+  const bar = $("searchBar"), open = bar.hidden;
+  bar.hidden = !open; $("searchBtn").setAttribute("aria-expanded", String(open));
+  if (open) $("search").focus(); else if ($("search").value){ $("search").value = ""; query = ""; render(); }
+};
+
+/* ---------- first-launch screen ---------- */
+function showIntro(){
+  if (load("hn:intro", false)) return;
+  const art = $("introArt"); art.textContent = "";
+  const imgs = [...(rel.items || []).filter(x => x.img).map(x => x.img), ...cache.items.filter(x => x.img).map(x => x.img)].slice(0, 9);
+  for (let i = 0; i < 9; i++){ const d = el("div"); if (imgs[i]) d.style.backgroundImage = "url(" + JSON.stringify(imgs[i]) + ")"; art.append(d); }
+  $("intro").hidden = false;
+}
+$("introGo").onclick = () => { save("hn:intro", true); $("intro").hidden = true; };
+
 /* ---------- reader ---------- */
 let readerSeq = 0, artTr = load("hn:art", {});
 async function gTranslate(text, item){
@@ -1634,6 +1979,10 @@ async function openReader(item){
   const t = tr[item.id] || (fa ? {t:item.title} : null);
   $("rTitle").textContent = t ? t.t : item.title; $("rTitle").dir = t ? "rtl" : "ltr";
   $("rOrig").hidden = fa;
+  const rs = $("rSrc"); rs.textContent = ""; rs.append(srcIcon(item), el("span", "", item.src));
+  if (!item.search) rs.insertAdjacentHTML("beforeend", VERIFIED);
+  rs.append(el("span", "t", ago(item.ts)));
+  readerItem = item; paintSave();
   const hero = $("rHero"); hero.hidden = !item.img; if (item.img) hero.src = item.img;
   hero.onerror = () => { hero.hidden = true; };
   const body = $("rBody"); body.textContent = "";
@@ -1988,8 +2337,14 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 
 /* ---------- start ---------- */
 applyTheme(); applyBg(); paintHeader(); renderTabs(); render(); tryPendingRead();
+setTimeout(showIntro, 400);
 loadRemoteConfig().then(changed => {
-  if ((migratedFeeds || igRemoved) && settings.ghToken) pushConfig().catch(() => {});
+  setStatus();
+  const remoteHasIg = !!(remoteCfg && (remoteCfg.feeds || []).some(f => /instagram\.com/i.test(f.url)));
+  if ((migratedFeeds || igRemoved || remoteHasIg) && settings.ghToken){
+    if (remoteHasIg) settings.cfgUpdated = Date.now(), save("hn:settings", settings);
+    pushConfig().catch(() => {});
+  }
   if (NATIVE) refreshInstagram(false);
   if (NATIVE && NATIVE.setToken) NATIVE.setToken(settings.ghToken || "");
   loadReleases(); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
