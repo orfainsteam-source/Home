@@ -1,5 +1,5 @@
 {
-  "updated": 1791657917835,
+  "updated": 1791658074813,
   "foreign": true,
   "feeds": [
     {
@@ -100,6 +100,12 @@
     {
       "name": "fromsoftware",
       "url": "https://www.instagram.com/fromsoftware_pj/",
+      "cat": "game",
+      "on": true
+    },
+    {
+      "name": "morad",
+      "url": "https://www.instagram.com/vaisi_morad/",
       "cat": "game",
       "on": true
     }
