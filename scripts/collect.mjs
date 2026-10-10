@@ -123,6 +123,26 @@ function parseTelegram(page, feed){
   }).filter(Boolean).reverse();
 }
 
+/* ---------- public Instagram pages (no login) ---------- */
+const igName = url => (url.match(/instagram\.com\/([A-Za-z0-9_.]+)/i) || [])[1] || "";
+async function fetchInstagram(feed){
+  const user = igName(feed.url);
+  const r = await get("https://www.instagram.com/api/v1/feed/user/" + user + "/username/?count=12",
+    {tries:2, headers:{"x-ig-app-id":"936619743392459", "Accept":"application/json", "Referer":"https://www.instagram.com/" + user + "/"}});
+  const d = JSON.parse(r.text);
+  return (d.items || []).map(x => {
+    const cap = ((x.caption || {}).text || "").replace(/\r/g, "");
+    const media = x.image_versions2 ? x : ((x.carousel_media || [])[0] || {});
+    const img = (((media.image_versions2 || {}).candidates || [])[0] || {}).url || "";
+    const lines = cap.split("\n").map(l => l.replace(/^[\s\p{Extended_Pictographic}\u200d\ufe0f•▪️◾️🔸🔹➖⏺🔻]+/u, "").trim())
+      .filter(l => l && !/^[#@]/.test(l) && !/^(لینک|link in bio)/i.test(l));
+    if (!lines.length || !img) return null;
+    return {title: lines[0].slice(0, 220), summary: clip(lines.slice(1).join(" "), 300), link: "https://www.instagram.com/p/" + x.code + "/",
+            img, ts: (x.taken_at || 0) * 1000, src: feed.name, cat: feed.cat, ...(hasFa(cap) ? {lang:"fa"} : {}),
+            _tg: lines.slice(1).map(t => ({t:"p", x:t}))};
+  }).filter(Boolean);
+}
+
 function searchSources(fav, cat){
   const quoted = fav.terms.map(t => '"' + t.replace(/"/g, "") + '"');
   const words = CAT_WORDS[cat] || [];
@@ -137,7 +157,7 @@ function searchSources(fav, cat){
 /* ---------- Persian web search (Bing, Persian edition) ---------- */
 const toFaDigits = t => t.replace(/[0-9]/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
 const toEnDigits = t => t.replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
-const hasFa = t => /[\u0600-\u06FF]/.test(t || "");
+function hasFa(t){ return /[\u0600-\u06FF]/.test(t || ""); }
 function persianSources(fav, cat, meta){
   const fa = [...new Set((meta.fa || []).flatMap(n => [n, toFaDigits(n), toEnDigits(n)]))];
   const qs = [];
@@ -278,12 +298,89 @@ async function fetchArticle(item){
   return {og: okUrl(og), blocks, url: page.url, desc: strip(desc)};
 }
 
+/* ---------- release calendar (Wikipedia "List of video games released in YEAR") ---------- */
+const MONTHS = {January:0, February:1, March:2, April:3, May:4, June:5, July:6, August:7, September:8, October:9, November:10, December:11};
+async function wikiReleases(year){
+  const page = await get("https://en.wikipedia.org/api/rest_v1/page/html/List_of_video_games_released_in_" + year,
+    {ms:40000, headers:{"User-Agent":"DashboardBot/1.0 (github.com/orfainsteam-source/Home)"}});
+  const { document } = parseHTML(page.text);
+  const out = [];
+  for (const t of document.querySelectorAll("table.wikitable")){
+    const head = [...t.querySelectorAll("tr")][0];
+    const cols = head ? [...head.querySelectorAll("th")].map(h => h.textContent.trim().toLowerCase()) : [];
+    const dated = cols[0] && cols[0].startsWith("release");
+    const tba = cols[0] && cols[0].startsWith("title");
+    if (!dated && !tba) continue;
+    let lastDate = "";
+    for (const tr of [...t.querySelectorAll("tr")].slice(1)){
+      const tds = [...tr.children].filter(c => c.tagName === "TD");
+      if (!tds.length) continue;
+      let i = 0, date = "";
+      if (dated){
+        const m = tds[0].textContent.trim().match(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})/);
+        if (m){ date = m[0]; i = 1; lastDate = date; } else date = lastDate;   // rowspan: تاریخ ردیف قبل
+      }
+      const tcell = tds[i]; if (!tcell) continue;
+      const a = tcell.querySelector("a[rel='mw:WikiLink']");
+      const title = tcell.textContent.replace(/\[.*?\]/g, "").trim();
+      const plat = (tds[i + (tba ? 2 : 1)] || {}).textContent || "";
+      const type = ((tds[i + (tba ? 3 : 2)] || {}).textContent || "").trim();
+      if (!title || !a || !/original|remake/i.test(type)) continue;   // فقط بازی‌های مهم (مقاله دارند) و اصلی/ریمیک
+      let ts = 0, approx = "";
+      if (dated && date){ const [mn, dd] = date.split(/\s+/); ts = Date.UTC(year, MONTHS[mn], +dd); }
+      else approx = (tds[i + 1] || {}).textContent ? tds[i + 1].textContent.replace(/\[.*?\]/g, "").trim() : String(year);
+      out.push({title, wiki: decodeURIComponent((a.getAttribute("href") || "").replace(/^\.\//, "")), ts, approx: approx || "",
+                year, plat: plat.replace(/\[.*?\]/g, "").trim()});
+    }
+  }
+  return out;
+}
+async function wikiCovers(list){
+  for (let i = 0; i < list.length; i += 40){
+    const part = list.slice(i, i + 40);
+    try {
+      const d = await json("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&piprop=thumbnail&pithumbsize=480&pilicense=any&redirects=1&titles="
+        + encodeURIComponent(part.map(x => x.wiki.replace(/_/g, " ")).join("|")), {headers:{"User-Agent":"DashboardBot/1.0"}});
+      const map = {};
+      for (const r of (d.query.redirects || [])) map[r.to] = r.from;
+      for (const n of (d.query.normalized || [])) map[n.to] = map[n.to] || n.from;
+      for (const pg of Object.values(d.query.pages || {})){
+        const from = map[pg.title] || pg.title;
+        for (const x of part) if (x.wiki.replace(/_/g, " ") === from || x.wiki.replace(/_/g, " ") === pg.title) x.img = (pg.thumbnail || {}).source || x.img || "";
+      }
+    } catch {}
+  }
+}
+async function youtubeTrailer(title){
+  const r = await get("https://www.youtube.com/results?search_query=" + encodeURIComponent(title + " official trailer") + "&hl=en", {tries:1, ms:15000});
+  return (r.text.match(/"videoId":"([A-Za-z0-9_-]{11})"/) || [])[1] || "";
+}
+async function buildReleases(favNames){
+  const prevRel = (await remoteJson("/data/releases.json")) || {};
+  if (prevRel.ts && Date.now() - prevRel.ts < 6*3600e3 && prevRel.items) return prevRel;   // هر ۶ ساعت کافی است
+  const now = Date.now(), y = new Date().getUTCFullYear();
+  let list = [];
+  for (const yr of [y, y + 1]) { try { list.push(...await wikiReleases(yr)); } catch(e){ console.log("releases failed", yr, e.message); } }
+  const from = now - 8*864e5, to = now + 366*864e5;
+  list = list.filter(x => x.ts ? (x.ts >= from && x.ts <= to) : x.year <= y + 1);
+  const seenR = new Set(); list = list.filter(x => { const k = norm(x.title); if (seenR.has(k)) return false; seenR.add(k); return true; });
+  const old = new Map((prevRel.items || []).map(x => [norm(x.title), x]));
+  for (const x of list){ const o = old.get(norm(x.title)); if (o){ x.img = o.img; x.yt = o.yt; } }
+  await wikiCovers(list.filter(x => !x.img));
+  // تریلر: اول بازی‌های نزدیک‌تر و علاقه‌مندی‌ها
+  const want = list.filter(x => x.yt === undefined).sort((a, b) => (favNames.has(norm(b.title)) - favNames.has(norm(a.title))) || ((a.ts || 9e15) - (b.ts || 9e15))).slice(0, 60);
+  await pool(want, 3, async x => { try { x.yt = await youtubeTrailer(x.title); } catch { x.yt = ""; } });
+  list.sort((a, b) => (a.ts || 9e15) - (b.ts || 9e15));
+  console.log(`releases: ${list.length}, with cover: ${list.filter(x => x.img).length}, trailers: ${list.filter(x => x.yt).length}`);
+  return {ts: Date.now(), items: list};
+}
+
 /* ---------- main ---------- */
 async function loadJson(p, fallback){ try { return JSON.parse(await fs.readFile(p, "utf8")); } catch { return fallback; } }
 async function remoteJson(u){ if (!SITE) return null; try { return JSON.parse((await get(SITE + u + "?t=" + Date.now(), {tries:1, ms:15000})).text); } catch { return null; } }
 
 const config = await loadJson(path.join(ROOT, "config", "config.json"), {});
-const feeds = (config.feeds && config.feeds.length ? config.feeds : DEFAULT_FEEDS).filter(f => f.on && !/instagram\.com/i.test(f.url));
+const feeds = (config.feeds && config.feeds.length ? config.feeds : DEFAULT_FEEDS).filter(f => f.on);
 const favs = config.favs || {};
 const FOREIGN = !!config.foreign;   // خبرهای انگلیسی (با ترجمه) هم بیاید؟
 const prev = (await remoteJson("/data/news.json")) || {items:[]};
@@ -309,6 +406,7 @@ for (const [f, cat] of favList){
 }
 const sources = [...feeds, ...searches];
 const results = await pool(sources, 5, async src => {
+  if (!src.search && igName(src.url)) return (await fetchInstagram(src)).slice(0, PER_FEED);
   const tg = !src.search && tgName(src.url);
   let r;
   for (let t = 0; t < (src.persian ? 4 : 1); t++){   // بینگ گاهی صفحه‌ی خالی می‌دهد
@@ -411,4 +509,8 @@ all = all.filter(x => x.img);
 console.log(`enriched: ${enriched}, dropped without cover: ${noCover}, kept: ${all.length}, full text: ${all.filter(x => x.full).length}`);
 
 await fs.writeFile(path.join(OUT, "meta.json"), JSON.stringify(meta));
+try {
+  const favNames = new Set((favs.game || []).map(f => norm(f.name)));
+  await fs.writeFile(path.join(OUT, "releases.json"), JSON.stringify(await buildReleases(favNames)));
+} catch(e){ console.log("releases error", e.message); }
 await fs.writeFile(path.join(OUT, "news.json"), JSON.stringify({ts: Date.now(), items: all, failed}));

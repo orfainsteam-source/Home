@@ -8,4 +8,6 @@
     <color name="w_line">#1F1B1736</color>
     <color name="w_accent">#0E9AA0</color>
     <color name="w_fav">#D5508E</color>
+    <color name="w_chip">#141B1736</color>
+    <color name="w_on_accent">#FFFFFF</color>
 </resources>

@@ -37,7 +37,12 @@ public class MainActivity extends Activity {
 
     /** پل بین صفحه و اپ: فقط برای خواندن پست‌های اینستاگرام با حساب واردشده‌ی کاربر */
     class Bridge {
-        @JavascriptInterface public String version() { return "2"; }
+        @JavascriptInterface public String version() { return "3"; }
+
+        /** توکن GitHub برای اینکه ویجت بتواند جمع‌آوری تازه بخواهد */
+        @JavascriptInterface public void setToken(String t) {
+            getSharedPreferences("widget", 0).edit().putString("gh_token", t == null ? "" : t.trim()).apply();
+        }
 
         @JavascriptInterface public boolean igLoggedIn() {
             String c = CookieManager.getInstance().getCookie("https://www.instagram.com/");

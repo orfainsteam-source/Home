@@ -16,10 +16,12 @@
         android:gravity="center_vertical"
         android:paddingBottom="8dp">
         <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:id="@+id/w_mark"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:padding="4dp"
             android:src="@drawable/ic_mark"
-            android:importantForAccessibility="no" />
+            android:contentDescription="Dashboard" />
         <TextView
             android:id="@+id/w_title"
             android:layout_width="0dp"
@@ -44,6 +46,62 @@
             android:padding="6dp"
             android:src="@drawable/ic_refresh"
             android:contentDescription="@string/widget_refresh" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/w_cats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+        <TextView
+            android:id="@+id/c_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@drawable/chip_off"
+            android:text="★ علاقه‌مندی‌ها"
+            android:textColor="@color/w_text"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/c_all"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@drawable/chip_off"
+            android:text="همه"
+            android:textColor="@color/w_text"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/c_game"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@drawable/chip_off"
+            android:text="گیم"
+            android:textColor="@color/w_text"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/c_anime"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@drawable/chip_off"
+            android:text="انیمه"
+            android:textColor="@color/w_text"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <ListView

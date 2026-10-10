@@ -144,6 +144,71 @@ h1 .mark{display:inline-block;width:.42em;height:.42em;border-radius:50%;margin-
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty .btn{margin-top:14px}
 
+/* favourites dropdown */
+.favdrop{position:relative;margin:2px 0 12px}
+.favdrop[hidden]{display:none}
+.fd-btn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--glass);color:var(--ink);
+  border-radius:999px;padding:5px 8px 5px 14px;cursor:pointer;font:inherit;font-size:.92rem;max-width:100%}
+.fd-btn img,.fd-btn .ph{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;background:color-mix(in srgb,var(--c,var(--other)) 30%,var(--bg))}
+.fd-btn .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
+.fd-btn svg{flex:none;opacity:.7}
+.fd-panel{position:absolute;top:calc(100% + 6px);right:0;z-index:20;width:min(360px,calc(100vw - 32px));max-height:min(62vh,520px);overflow-y:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 44px rgb(10 8 30 / .28);padding:6px;margin:0;list-style:none}
+.fd-panel[hidden]{display:none}
+.fd-panel .grp{font-size:.78rem;color:var(--muted);padding:8px 10px 4px}
+.fd-panel button{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--ink);font:inherit;text-align:right;
+  padding:7px 8px;border-radius:10px;cursor:pointer}
+.fd-panel button:hover,.fd-panel button[aria-current="true"]{background:color-mix(in srgb,var(--c,var(--ink)) 14%,transparent)}
+.fd-panel img,.fd-panel .ph{width:42px;height:42px;border-radius:10px;object-fit:cover;flex:none;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--c) 70%,#120f2a),color-mix(in srgb,var(--c) 30%,#120f2a));
+  display:grid;place-items:center;color:#fff;font-weight:700;font-family:system-ui,sans-serif}
+.fd-panel .t{flex:1;min-width:0}
+.fd-panel .t b{display:block;direction:ltr;text-align:right;unicode-bidi:isolate;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-panel .t small{color:var(--muted);font-size:.78rem}
+.fd-panel .c{font-size:.82rem;color:var(--muted);min-width:1.6em;text-align:center}
+
+/* release calendar */
+.rel{margin:0 0 18px}
+.rel[hidden]{display:none}
+.rel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.rel-head h3{margin:0;font-family:var(--display);font-weight:400;font-size:1.25rem}
+.rel-row{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.rel-sep{flex:none;align-self:stretch;display:flex;align-items:center;writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:.78rem;color:var(--muted);border-inline-start:1px dashed var(--line);padding:0 4px}
+.rc{flex:none;width:128px;scroll-snap-align:start;border:0;background:none;padding:0;text-align:right;color:var(--ink);font:inherit;cursor:pointer}
+.rc .cv{position:relative;width:128px;height:170px;border-radius:12px;overflow:hidden;background:var(--line);box-shadow:0 8px 20px rgb(10 8 30 / .18)}
+.rc .cv img{width:100%;height:100%;object-fit:cover;display:block}
+.rc .cv .ph{display:grid;place-items:center;height:100%;padding:10px;text-align:center;font-weight:700;color:#fff;direction:ltr;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--game) 70%,#120f2a),#120f2a)}
+.rc .play{position:absolute;inset:auto 8px 8px auto;width:30px;height:30px;border-radius:50%;background:rgb(0 0 0 / .55);display:grid;place-items:center}
+.rc .when{position:absolute;inset:8px auto auto 8px;background:var(--game);color:#0d0b1c;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px}
+.rc.past .when{background:var(--anime)}
+.rc b{display:block;margin-top:7px;font-size:.86rem;line-height:1.45;direction:ltr;text-align:right;unicode-bidi:isolate;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rc small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+.rc .star{color:var(--other)}
+dialog.sched{width:min(760px,100vw);max-height:92dvh}
+.sched-month{margin:18px 0 6px;font-weight:700;color:var(--game)}
+.sched-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.sched-row img,.sched-row .ph{width:44px;height:58px;border-radius:8px;object-fit:cover;flex:none;background:var(--line)}
+.sched-row .t{flex:1;min-width:0}
+.sched-row b{display:block;direction:ltr;text-align:right;unicode-bidi:isolate}
+.sched-row small{color:var(--muted);font-size:.78rem;direction:ltr;unicode-bidi:isolate}
+.sched-row .d{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.sched-row button{flex:none}
+dialog.player{width:min(960px,100vw);padding:0;background:#000;border:0;border-radius:14px;overflow:hidden}
+dialog.player::backdrop{background:rgb(0 0 0 / .8)}
+.player .frame{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.player .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;background:#111;color:#eee}
+.player .bar a{color:#9ad;font-size:.85rem}
+details.srcs{border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-top:8px}
+details.srcs>summary{cursor:pointer;padding:12px 0;font-weight:700;list-style:none;display:flex;justify-content:space-between}
+details.srcs>summary::-webkit-details-marker{display:none}
+details.srcs>summary::after{content:"▾";color:var(--muted)}
+details.srcs[open]>summary::after{content:"▴"}
+details.srcs[open]{padding-bottom:12px}
+
 /* reader */
 dialog.reader{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0;padding:0;
   background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
@@ -284,9 +349,19 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     </button>
     <input class="search" id="search" type="search" placeholder="جست‌وجو در خبرها">
   </div>
-  <div class="favbar" id="favbar" hidden></div>
+  <div class="favdrop" id="favbar" hidden>
+    <button class="fd-btn" id="fdBtn" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
+    <div class="fd-panel" id="fdPanel" hidden></div>
+  </div>
   <div class="fav-info" id="favInfo" hidden></div>
   <div class="status" id="status" aria-live="polite"></div>
+  <section class="rel" id="rel" hidden aria-label="تقویم بازی‌ها">
+    <div class="rel-head">
+      <h3>تقویم بازی‌ها</h3>
+      <button class="icon-btn" id="relAll" type="button">همه تا یک سال آینده</button>
+    </div>
+    <div class="rel-row" id="relRow"></div>
+  </section>
   <main id="feed"></main>
 </div>
 
@@ -295,7 +370,8 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <h3>تنظیمات</h3>
     <p class="hint">همه‌چیز فقط در مرورگر خودتان ذخیره می‌شود.</p>
 
-    <h4>منابع خبر</h4>
+    <details class="srcs" id="srcBox">
+    <summary id="srcSum">منابع خبر</summary>
     <div id="feedList"></div>
     <div class="add">
       <select id="newType" class="full" aria-label="نوع منبع">
@@ -308,7 +384,8 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <input id="newUrl" class="full ltr" placeholder="@myzoomg" inputmode="url">
       <button class="btn ghost full" id="addFeed" type="button">افزودن منبع</button>
     </div>
-    <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>)، پیج اینستاگرام (مثلاً <span dir="ltr">@gamefa.official</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرام یا اینستاگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند.</p>
+    <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>)، پیج اینستاگرام (مثلاً <span dir="ltr">@gamefa.official</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرام یا اینستاگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند. پیج‌های عمومی اینستاگرام بدون ورود خوانده می‌شوند.</p>
+    </details>
 
     <h4 id="favHead">علاقه‌مندی‌ها</h4>
     <p class="hint">اسم را تایپ کن و از پیشنهادها مورد درست را انتخاب کن. اسم رسمی و اسم‌های دیگرش خودکار ثبت می‌شوند. پیشنهاد بازی‌ها از Wikidata و انیمه‌ها از AniList می‌آید. اگر چیزی پیدا نشد، می‌توانی همان متن را دستی اضافه کنی. اسم‌های دیگر را با کاما جدا کن، مثلاً <span class="ltr" dir="ltr">GTA 6, GTA VI</span>. برای هر کدام، آخرین خبرهای یک ماه اخیر از کل اینترنت (Google News و Bing News) جمع می‌شود. بخشی که خالی بماند، همه‌ی خبرهای منابعش نشان داده می‌شود.</p>
@@ -323,7 +400,7 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     </div>
 
     <h4>اینستاگرام</h4>
-    <p class="hint" id="igHint">پیج‌های اینستاگرام (سایت‌های خبری یا هر شخصی) را از بخش منابع اضافه کن؛ نوع منبع را «اینستاگرام» بگذار. پست‌هایشان فقط داخل اپ اندروید خوانده می‌شود، چون اینستاگرام ورود به حساب می‌خواهد.</p>
+    <p class="hint" id="igHint">پیج‌های عمومی اینستاگرام بدون ورود به حساب خوانده می‌شوند. فقط اگر پیجی خوانده نشد، داخل اپ اندروید می‌توانی وارد اینستاگرام شوی تا اپ خودش آن را بخواند.</p>
     <div id="igBox" hidden>
       <div class="gh-state" id="igState"></div>
       <button class="btn ghost" id="igLogin" type="button" style="margin-top:8px">ورود به اینستاگرام</button>
@@ -366,6 +443,21 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <button class="btn ghost" id="closeSettings" type="button">بستن</button>
     </div>
   </div>
+</dialog>
+
+<dialog id="sched" class="sched" aria-label="تقویم بازی‌ها">
+  <div class="r-top" style="position:static">
+    <h3 style="margin:0">تقویم انتشار بازی‌ها</h3>
+    <button class="icon-btn round" id="schedClose" type="button" title="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span class="sr">بستن</span></button>
+  </div>
+  <div id="schedBody"></div>
+  <p class="hint">فهرست از ویکی‌پدیا؛ تاریخ‌ها ممکن است تغییر کنند.</p>
+</dialog>
+
+<dialog id="player" class="player" aria-label="تریلر">
+  <div class="frame" id="playerFrame"></div>
+  <div class="bar"><span id="playerTitle"></span><span><a id="playerYt" target="_blank" rel="noopener noreferrer">YouTube</a>
+    <button class="icon-btn" id="playerClose" type="button" style="margin-inline-start:10px">بستن</button></span></div>
 </dialog>
 
 <dialog id="reader" class="reader" aria-label="خواندن خبر">
@@ -788,6 +880,7 @@ async function refresh(manual){
   if (!d) return refreshDirect();
   applyData(d);
   refreshInstagram(manual);
+  if (manual) loadReleases();
   // با دکمه‌ی به‌روزرسانی، اگر داده‌ها کهنه‌اند و توکن داریم، یک جمع‌آوری تازه درخواست کن
   if (manual && settings.ghToken && Date.now() - d.ts > 8*60*1000){
     try { await requestCollect(); watchForUpdate(d.ts, "جمع‌آوری تازه شروع شد. چند دقیقه‌ی دیگر خبرها خودکار عوض می‌شوند."); } catch {}
@@ -986,31 +1079,57 @@ function makeCard(item, lead){
 
 function updateCard(id){ const c = cards.get(id); if (c) fillCard(c.item, c.parts); }
 
+const favThumb = (cat, f) => f.img || f.bg || "";
+let fdOpen = false;
 function renderFavUI(){
   const on = favMode();
   $("favToggle").setAttribute("aria-pressed", String(on));
   $("favToggleTxt").textContent = hasFavs() ? (on ? "فقط علاقه‌مندی‌ها" : "همه‌ی خبرها") : "تعیین علاقه‌مندی‌ها";
-  const bar = $("favbar"); bar.textContent = "";
+  const box = $("favbar"), btn = $("fdBtn"), panel = $("fdPanel");
   const cats = tab === "all" ? Object.keys(CATS) : [tab];
-  const list = on ? cats.flatMap(c => favsOf(c).map(f => ({cat:c, name:f.name}))) : [];
-  if (favPick && !list.some(f => f.cat + ":" + f.name === favPick)) favPick = "";
-  bar.hidden = list.length < 2;
-  if (bar.hidden){ paintFavInfo(); return; }
+  const list = on ? cats.flatMap(c => favsOf(c).map(f => ({cat:c, f}))) : [];
+  if (favPick && !list.some(x => x.cat + ":" + x.f.name === favPick)) favPick = "";
+  box.hidden = list.length < 2;
+  paintFavInfo();
+  if (box.hidden){ panel.hidden = true; return; }
+  for (const x of list) ensureArt(x.cat, x.f);   // تصویر همه را از قبل بگیر
   const count = {};
   for (const x of cache.items){ const h = favOf(x); if (h){ const k = favCatOf(x) + ":" + h; count[k] = (count[k] || 0) + 1; } }
-  const chip = (key, label, n, color) => {
-    const b = el("button", "chip" + (n === 0 ? " zero" : "")); b.type = "button";
-    b.setAttribute("aria-pressed", String(favPick === key));
-    if (color) b.style.setProperty("--c", color);
-    b.append(el("span", key ? "n" : "", label)); if (n) b.append(el("span", "c", n.toLocaleString("fa-IR")));
-    b.onclick = () => { favPick = favPick === key ? "" : key; render(); translateAll(); };
+  const pic = (cat, f, tag) => {
+    const u = f && favThumb(cat, f);
+    if (u){ const im = el("img"); im.src = u; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; im.onerror = () => im.replaceWith(el("span", "ph", (f.name || "?").charAt(0))); return im; }
+    const ph = el("span", "ph", tag || (f ? f.name.charAt(0) : "★")); return ph;
+  };
+  // دکمه: انتخاب فعلی
+  btn.textContent = "";
+  const cur = list.find(x => x.cat + ":" + x.f.name === favPick);
+  btn.style.setProperty("--c", cur ? CATS[cur.cat].color : "var(--other)");
+  btn.append(cur ? pic(cur.cat, cur.f) : el("span", "ph", "★"), el("span", "n", cur ? cur.f.name : "همه‌ی علاقه‌مندی‌ها"));
+  btn.insertAdjacentHTML("beforeend", '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>');
+  btn.setAttribute("aria-expanded", String(fdOpen));
+  // فهرست
+  panel.textContent = "";
+  const item = (key, cat, f, label, sub) => {
+    const b = el("button"); b.type = "button"; b.setAttribute("aria-current", String(favPick === key));
+    if (cat) b.style.setProperty("--c", CATS[cat].color);
+    const t = el("span", "t"); t.append(el("b", "", label)); if (sub) t.append(el("small", "", sub));
+    b.append(f ? pic(cat, f) : el("span", "ph", "★"), t);
+    const n = key ? count[key] || 0 : list.reduce((s, x) => s + (count[x.cat + ":" + x.f.name] || 0), 0);
+    b.append(el("span", "c", n ? n.toLocaleString("fa-IR") : "—"));
+    b.onclick = () => { favPick = key; fdOpen = false; panel.hidden = true; render(); translateAll(); window.scrollTo({top:0, behavior:"smooth"}); };
     return b;
   };
-  paintFavInfo();
-  bar.append(chip("", "همه‌ی علاقه‌مندی‌ها", null, ""));
-  for (const f of list){ const fo = favsOf(f.cat).find(x => x.name === f.name); if (fo) ensureArt(f.cat, fo); }   // آرت همه را از قبل بگیر تا عوض کردن سریع باشد
-  for (const f of list){ const k = f.cat + ":" + f.name; bar.append(chip(k, f.name, count[k] || 0, CATS[f.cat].color)); }
+  panel.append(item("", "", null, "همه‌ی علاقه‌مندی‌ها", ""));
+  let lastCat = "";
+  for (const x of list){
+    if (x.cat !== lastCat){ panel.append(el("div", "grp", CATS[x.cat].label)); lastCat = x.cat; }
+    panel.append(item(x.cat + ":" + x.f.name, x.cat, x.f, x.f.name, ""));
+  }
+  panel.hidden = !fdOpen;
 }
+$("fdBtn").onclick = e => { e.stopPropagation(); fdOpen = !fdOpen; $("fdPanel").hidden = !fdOpen; $("fdBtn").setAttribute("aria-expanded", String(fdOpen)); };
+document.addEventListener("click", e => { if (fdOpen && !$("favbar").contains(e.target)){ fdOpen = false; $("fdPanel").hidden = true; $("fdBtn").setAttribute("aria-expanded", "false"); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && fdOpen){ fdOpen = false; $("fdPanel").hidden = true; $("fdBtn").focus(); } });
 
 function paintFavInfo(){
   const box = $("favInfo"); box.textContent = "";
@@ -1099,7 +1218,7 @@ async function ensureArt(cat, f){
   const live = favsOf(cat).find(x => x.name === f.name);
   if (!live) return;
   live.bg = bg; save("hn:settings", settings);
-  if (favPick === key) render();
+  if (favPick === key) render(); else if (!$("favbar").hidden) renderFavUI();
 }
 // عکس پس‌زمینه برای علاقه‌مندیِ انتخاب‌شده: آرت رسمی، بعد پوستر، بعد عکس تازه‌ترین خبرش
 function favBackdrop(list){
@@ -1111,7 +1230,7 @@ function favBackdrop(list){
 }
 
 function render(){
-  renderFavUI();
+  renderFavUI(); paintReleases();
   const feed = $("feed"); feed.textContent = ""; cards.clear();
   const q = query.toLowerCase();
   const list = cache.items.filter(x => x.img && (tab === "all" || x.cat === tab || (tab !== "all" && x.favCat === tab)) && wanted(x) &&
@@ -1170,7 +1289,7 @@ const nativeGet = url => new Promise((res, rej) => {
   setTimeout(() => { if (nativeWait[id]){ delete nativeWait[id]; rej(new Error("timeout")); } }, 30000);
   NATIVE.request(id, url);
 });
-const igFeeds = () => settings.feeds.filter(f => f.on && /instagram\.com/i.test(f.url));
+const igFeeds = () => settings.feeds.filter(f => f.on && /instagram\.com/i.test(f.url) && (!cache.remote || (cache.failed || []).includes(f.name)));
 const igUser = f => (f.url.match(/instagram\.com\/([A-Za-z0-9_.]+)/i) || [])[1];
 let igCache = load("hn:ig", {ts:0, items:[], failed:[]});
 function igToItems(json, feed){
@@ -1185,15 +1304,31 @@ function igToItems(json, feed){
             src: feed.name, cat: feed.cat, ig:true, full: lines.length > 1, blocks: lines.slice(1).map(x => ({t:"p", x}))};
   });
 }
+function igFeedToItems(d, feed){
+  return (d.items || []).map(x => {
+    const cap = ((x.caption || {}).text || "");
+    const media = x.image_versions2 ? x : ((x.carousel_media || [])[0] || {});
+    const img = (((media.image_versions2 || {}).candidates || [])[0] || {}).url || "";
+    const lines = cap.split("\n").map(l => l.replace(/^[\s\p{Extended_Pictographic}\u200d\ufe0f•▪️◾️🔸🔹➖⏺🔻]+/u, "").trim()).filter(l => l && !/^[#@]/.test(l));
+    if (!lines.length || !img) return null;
+    return {id:"ig_" + x.code, title: lines[0].slice(0, 200), summary: lines.slice(1).join(" ").slice(0, 300), img,
+            link:"https://www.instagram.com/p/" + x.code + "/", ts:(x.taken_at || 0) * 1000, src: feed.name, cat: feed.cat,
+            ig:true, full: lines.length > 1, blocks: lines.slice(1).map(t => ({t:"p", x:t}))};
+  }).filter(Boolean);
+}
 async function refreshInstagram(force){
   if (!NATIVE || !igFeeds().length) return;
   if (!force && Date.now() - igCache.ts < 20*60*1000){ mergeIg(); return; }
   const items = [], failed = [];
   for (const f of igFeeds()){
     try {
-      const r = await nativeGet("https://www.instagram.com/api/v1/users/web_profile_info/?username=" + encodeURIComponent(igUser(f)));
-      if (r.status !== 200) throw new Error("HTTP " + r.status);
-      items.push(...igToItems(JSON.parse(r.body), f).slice(0, 12));
+      let r = await nativeGet("https://www.instagram.com/api/v1/feed/user/" + encodeURIComponent(igUser(f)) + "/username/?count=12");
+      if (r.status === 200) items.push(...igFeedToItems(JSON.parse(r.body), f));
+      else {
+        r = await nativeGet("https://www.instagram.com/api/v1/users/web_profile_info/?username=" + encodeURIComponent(igUser(f)));
+        if (r.status !== 200) throw new Error("HTTP " + r.status);
+        items.push(...igToItems(JSON.parse(r.body), f).slice(0, 12));
+      }
     } catch { failed.push(f.name); }
     await new Promise(r => setTimeout(r, 1200));   // پشت‌سرهم درخواست ندهیم
   }
@@ -1215,6 +1350,92 @@ function paintIg(){
   $("igState").textContent = ok ? "به اینستاگرام وصل هستی." : "هنوز وارد اینستاگرام نشده‌ای؛ بدون ورود، پست‌ها خوانده نمی‌شوند.";
   $("igLogin").textContent = ok ? "ورود دوباره" : "ورود به اینستاگرام";
 }
+
+/* ---------- release calendar ---------- */
+let rel = load("hn:rel", {ts:0, items:[]});
+const faDate = ts => new Intl.DateTimeFormat("fa-IR-u-ca-persian", {day:"numeric", month:"long", timeZone:"UTC"}).format(ts);
+const faMonth = ts => new Intl.DateTimeFormat("fa-IR-u-ca-persian", {month:"long", year:"numeric", timeZone:"UTC"}).format(ts);
+function relWhen(ts){
+  const day = 864e5, today = Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  const d = Math.round((ts - today) / day);
+  if (d === 0) return "امروز";
+  if (d === 1) return "فردا";
+  if (d === -1) return "دیروز";
+  if (d < 0) return (-d).toLocaleString("fa-IR") + " روز پیش";
+  if (d < 14) return d.toLocaleString("fa-IR") + " روز دیگر";
+  return faDate(ts);
+}
+const isFavGame = title => favsOf("game").some(f => f.terms.some(t => norm(title).includes(norm(t))));
+async function loadReleases(){
+  try {
+    const d = JSON.parse(await fetchText("data/releases.json?t=" + Math.floor(Date.now() / 6e5), {}, 15000));
+    if (d && d.items){ rel = d; save("hn:rel", rel); paintReleases(); }
+  } catch {}
+}
+function relCard(x, past){
+  const b = el("button", "rc" + (past ? " past" : "")); b.type = "button";
+  const cv = el("div", "cv");
+  if (x.img){ const im = el("img"); im.src = x.img; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+    im.onerror = () => im.replaceWith(el("div", "ph", x.title)); cv.append(im); }
+  else cv.append(el("div", "ph", x.title));
+  cv.append(el("span", "when", relWhen(x.ts)));
+  if (x.yt) cv.insertAdjacentHTML("beforeend", '<span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>');
+  b.append(cv);
+  const t = el("b"); if (isFavGame(x.title)) t.append(el("span", "star", "★ ")); t.append(x.title); b.append(t);
+  b.append(el("small", "", (x.plat || "").split(",").slice(0, 3).join("،")));
+  b.onclick = () => playTrailer(x);
+  return b;
+}
+function paintReleases(){
+  const box = $("rel");
+  const now = Date.now(), day = 864e5;
+  const past = rel.items.filter(x => x.ts && x.ts < now - day * 0 && x.ts >= now - 8 * day).sort((a, b) => b.ts - a.ts);
+  const soon = rel.items.filter(x => x.ts && x.ts >= now - day / 2 && x.ts <= now + 75 * day);
+  box.hidden = !(tab === "all" || tab === "game") || !(past.length + soon.length);
+  if (box.hidden) return;
+  const row = $("relRow"); row.textContent = "";
+  for (const x of past) row.append(relCard(x, true));
+  if (past.length && soon.length) row.append(el("span", "rel-sep", "به‌زودی"));
+  for (const x of soon) row.append(relCard(x, false));
+}
+function paintSchedule(){
+  const body = $("schedBody"); body.textContent = "";
+  const now = Date.now();
+  const dated = rel.items.filter(x => x.ts && x.ts >= now - 8 * 864e5), tba = rel.items.filter(x => !x.ts);
+  let month = "";
+  const row = x => {
+    const r = el("div", "sched-row");
+    if (x.img){ const im = el("img"); im.src = x.img; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; r.append(im); } else r.append(el("span", "ph"));
+    const t = el("div", "t"); const b = el("b"); if (isFavGame(x.title)) b.append(el("span", "star", "★ ")); b.append(x.title);
+    t.append(b, el("small", "", x.plat || "")); r.append(t);
+    r.append(el("span", "d", x.ts ? (x.ts < now ? "منتشر شد · " : "") + faDate(x.ts) : (x.approx && !/unknown|tba/i.test(x.approx) ? x.approx : "نامشخص")));
+    const p = el("button", "icon-btn", x.yt ? "▶ تریلر" : "تریلر"); p.type = "button"; p.onclick = () => playTrailer(x); r.append(p);
+    return r;
+  };
+  for (const x of dated){
+    const m = x.ts < now ? "این هفته منتشر شد" : faMonth(x.ts);
+    if (m !== month){ body.append(el("div", "sched-month", m)); month = m; }
+    body.append(row(x));
+  }
+  if (tba.length){ body.append(el("div", "sched-month", "تاریخ دقیق اعلام نشده")); for (const x of tba) body.append(row(x)); }
+}
+function playTrailer(x){
+  const search = "https://www.youtube.com/results?search_query=" + encodeURIComponent(x.title + " official trailer");
+  if (!x.yt){ window.open(search, "_blank", "noopener"); return; }
+  $("playerTitle").textContent = x.title;
+  $("playerYt").href = "https://www.youtube.com/watch?v=" + x.yt;
+  const f = $("playerFrame"); f.textContent = "";
+  const ifr = el("iframe");
+  ifr.src = "https://www.youtube-nocookie.com/embed/" + x.yt + "?autoplay=1&rel=0&playsinline=1";
+  ifr.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; ifr.allowFullscreen = true;
+  ifr.referrerPolicy = "strict-origin-when-cross-origin"; ifr.title = x.title;
+  f.append(ifr);
+  if (!$("player").open) $("player").showModal();
+}
+$("relAll").onclick = () => { paintSchedule(); $("sched").showModal(); };
+$("schedClose").onclick = () => $("sched").close();
+$("playerClose").onclick = () => $("player").close();
+$("player").addEventListener("close", () => { $("playerFrame").textContent = ""; });
 
 /* ---------- reader ---------- */
 let readerSeq = 0, artTr = load("hn:art", {});
@@ -1339,6 +1560,7 @@ function openSettings(){
   const sel = $("newCat"); sel.textContent = "";
   for (const [k, v] of Object.entries(CATS)){ const o = el("option", "", v.label); o.value = k; sel.append(o); }
   paintFeedList(); paintFavEdit();
+  $("srcBox").open = false;
   document.querySelectorAll('input[name="engine"]').forEach(r => r.checked = r.value === draft.engine);
   $("foreign").checked = !!draft.foreign; paintIg();
   $("ghToken").value = draft.ghToken || ""; $("ghState").textContent = ""; $("ghState").className = "gh-state";
@@ -1346,6 +1568,7 @@ function openSettings(){
   $("settings").showModal();
 }
 function paintFeedList(){
+  $("srcSum").textContent = "منابع خبر (" + draft.feeds.filter(f => f.on).length.toLocaleString("fa-IR") + " فعال از " + draft.feeds.length.toLocaleString("fa-IR") + ")";
   const box = $("feedList"); box.textContent = "";
   draft.feeds.forEach((f, i) => {
     const row = el("div", "feed-row");
@@ -1497,6 +1720,7 @@ $("saveSettings").onclick = () => {
   const depthBefore = perFeed();
   if (favsChanged && !hasFavs()) draft.favOnly = true;   // اولین بار که علاقه‌مندی اضافه می‌شود، فیلتر روشن باشد
   const tokenBefore = settings.ghToken;
+  if (NATIVE && NATIVE.setToken) NATIVE.setToken(draft.ghToken || "");
   settings = draft; save("hn:settings", settings);
   if (favsChanged){ favMemo = new Map(); favPick = ""; }
   applyTheme(); renderTabs(); $("settings").close();
@@ -1549,7 +1773,9 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 applyTheme(); paintHeader(); renderTabs(); render(); tryPendingRead();
 loadRemoteConfig().then(changed => {
   if (migratedFeeds && settings.ghToken) pushConfig().catch(() => {});
-  if (NATIVE) refreshInstagram(false); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
+  if (NATIVE) refreshInstagram(false);
+  if (NATIVE && NATIVE.setToken) NATIVE.setToken(settings.ghToken || "");
+  loadReleases(); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
 setInterval(() => { paintHeader(); if (!document.hidden && isStale()) refresh(); }, 60*1000);
 window.__homeResumed = () => { paintHeader(); if (NATIVE && $("settings").open) paintIg(); };
 document.addEventListener("visibilitychange", () => { if (!document.hidden && isStale()) refresh(); });

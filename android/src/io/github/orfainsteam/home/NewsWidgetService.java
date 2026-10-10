@@ -31,11 +31,13 @@ public class NewsWidgetService extends RemoteViewsService {
     static final int MAX = 14;
 
     @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) { return new Factory(getApplicationContext()); }
+    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+        return new Factory(getApplicationContext(), intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0));
+    }
 
     static String lastUpdated(Context ctx) {
         long t = ctx.getSharedPreferences("widget", 0).getLong("fetched", 0);
-        return t == 0 ? "" : ago(t);
+        return t == 0 ? "" : "به‌روز شد · " + fa(new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date(t)));
     }
 
     static String fa(String s) {
@@ -54,14 +56,14 @@ public class NewsWidgetService extends RemoteViewsService {
         return d == 1 ? "دیروز" : fa(d + " روز پیش");
     }
 
-    static class Entry { String id, title, src, img, fav; long ts; Bitmap bmp; }
+    static class Entry { String id, title, src, img, fav, cat, favCat; long ts; boolean search; Bitmap bmp; }
 
     static class Factory implements RemoteViewsFactory {
-        final Context ctx;
+        final Context ctx; final int widgetId;
         List<Entry> items = new ArrayList<>();
         final Map<String, Bitmap> cache = new HashMap<>();
 
-        Factory(Context c) { ctx = c; }
+        Factory(Context c, int id) { ctx = c; widgetId = id; }
 
         @Override public void onCreate() { }
         @Override public void onDestroy() { items.clear(); cache.clear(); }
@@ -114,23 +116,35 @@ public class NewsWidgetService extends RemoteViewsService {
         public void onDataSetChanged() {
             List<Entry> fresh = new ArrayList<>();
             try {
-                JSONArray arr = new JSONObject(fetch(DATA + "?t=" + System.currentTimeMillis())).getJSONArray("items");
+                JSONObject root = new JSONObject(fetch(DATA + "?t=" + System.currentTimeMillis()));
+                ctx.getSharedPreferences("widget", 0).edit().putLong("data_ts", root.optLong("ts")).apply();
+                JSONArray arr = root.getJSONArray("items");
+                String cat = NewsWidget.catOf(ctx, widgetId);
                 List<Entry> favs = new ArrayList<>(), rest = new ArrayList<>();
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject o = arr.getJSONObject(i);
                     Entry e = new Entry();
                     e.id = o.optString("id"); e.title = o.optString("title"); e.src = o.optString("src");
                     e.img = o.optString("img"); e.fav = o.optString("fav", ""); e.ts = o.optLong("ts");
+                    e.cat = o.optString("cat"); e.favCat = o.optString("favCat", e.cat); e.search = o.optBoolean("search");
                     if (e.title.isEmpty() || e.img.isEmpty()) continue;
+                    boolean inCat = "all".equals(cat) || "fav".equals(cat) || cat.equals(e.cat) || cat.equals(e.favCat);
+                    if (!inCat) continue;
                     if (!e.fav.isEmpty()) favs.add(e);
-                    else if (!o.optBoolean("search")) rest.add(e);
+                    else if (!e.search && !"fav".equals(cat)) rest.add(e);
                 }
-                // اول خبرهای علاقه‌مندی‌ها؛ اگر کم بود، بقیه‌ی خبرها
-                fresh.addAll(favs.subList(0, Math.min(MAX, favs.size())));
-                for (Entry e : rest) { if (fresh.size() >= MAX) break; fresh.add(e); }
+                if ("fav".equals(cat) || !"all".equals(cat)) {
+                    // علاقه‌مندی‌ها (و در دسته‌ها: اول علاقه‌مندی‌های آن دسته، بعد بقیه)
+                    fresh.addAll(favs.subList(0, Math.min(MAX, favs.size())));
+                    for (Entry e : rest) { if (fresh.size() >= MAX) break; fresh.add(e); }
+                } else {
+                    List<Entry> mix = new ArrayList<>(rest); mix.addAll(favs);
+                    fresh.addAll(mix);
+                }
                 java.util.Collections.sort(fresh, new java.util.Comparator<Entry>() {
                     @Override public int compare(Entry a, Entry b) { return Long.compare(b.ts, a.ts); }
                 });
+                if (fresh.size() > MAX) fresh = new ArrayList<>(fresh.subList(0, MAX));
             } catch (Exception e) {
                 return;   // خطای شبکه: خبرهای قبلی بمانند
             }
@@ -149,7 +163,7 @@ public class NewsWidgetService extends RemoteViewsService {
             AppWidgetManager mgr = AppWidgetManager.getInstance(ctx);
             for (int id : mgr.getAppWidgetIds(new ComponentName(ctx, NewsWidget.class))) {
                 RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.widget);
-                v.setTextViewText(R.id.w_updated, "همین حالا");
+                v.setTextViewText(R.id.w_updated, "به‌روز شد · " + fa(new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date())));
                 mgr.partiallyUpdateAppWidget(id, v);
             }
         }
