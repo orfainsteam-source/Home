@@ -1288,6 +1288,12 @@ function render(){
     if (busy) box.append("در حال گرفتن خبرها…");
     else if (!cache.items.length) box.append("هنوز خبری نیامده. دکمه‌ی به‌روزرسانی را بزنید.");
     else if (q) box.append("خبری با این جست‌وجو پیدا نشد.");
+    else if (tab === "ig" && NATIVE && !NATIVE.igLoggedIn()){
+      box.append(el("div", "", "اینستاگرام از اینترنت VPN بدون ورود به حساب پست نشان نمی‌دهد. یک بار وارد شو؛ بعد پست‌ها همین‌جا می‌آیند."));
+      const b = el("button", "btn ghost", "ورود به اینستاگرام"); b.type = "button";
+      b.onclick = () => NATIVE.openInstagramLogin(); box.append(b);
+    }
+    else if (tab === "ig" && !NATIVE) box.append("پست‌های اینستاگرام فقط در اپ اندروید نشان داده می‌شود.");
     else if (favMode()){
       box.append(el("div", "", "برای علاقه‌مندی‌هایت خبری پیدا نشد."));
       const b = el("button", "btn ghost", "نمایش همه‌ی خبرها"); b.type = "button";

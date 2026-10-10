@@ -31,6 +31,9 @@ public class WidgetAction extends Activity {
             mgr.notifyAppWidgetViewDataChanged(all, R.id.w_list);
             new Thread(new Runnable() { public void run() { NewsWidget.requestCollect(ctx); } }).start();
         }
+        // روی بعضی گوشی‌ها (Honor/Huawei) این اکتیویتی داخل کار اصلی اپ باز می‌شود و اپ را جلو می‌آورد؛
+        // کل آن کار را به عقب می‌فرستیم تا کاربر روی صفحه‌ی اصلی گوشی بماند
+        moveTaskToBack(true);
         finish();
         overridePendingTransition(0, 0);
     }
