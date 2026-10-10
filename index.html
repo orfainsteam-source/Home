@@ -1318,7 +1318,12 @@ function setStatus(msg, trFails = 0){
   const parts = [];
   if (cache.ts) parts.push(["", "آخرین جمع‌آوری " + ago(cache.ts)]);
   if (translating) parts.push(["", "در حال ترجمه…"]);
-  if (cache.failed && cache.failed.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + cache.failed.join("، ")]);
+  // پیج‌های اینستاگرامی که سرور نتوانست بخواند، داخل اپ اندروید از راه خود گوشی خوانده می‌شوند
+  const igNames = new Set(settings.feeds.filter(f => /instagram\.com/i.test(f.url)).map(f => f.name));
+  const failedNow = (cache.failed || []).filter(n => !igNames.has(n));
+  const igOnlyApp = (cache.failed || []).filter(n => igNames.has(n));
+  if (failedNow.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + failedNow.join("، ")]);
+  if (igOnlyApp.length && !NATIVE) parts.push(["", "پست‌های " + igOnlyApp.join("، ") + " فقط در اپ اندروید نشان داده می‌شود"]);
   if (NATIVE && cache.igFailed && cache.igFailed.length)
     parts.push(["warn", "این پیج‌های اینستاگرام خوانده نشدند: " + cache.igFailed.join("، ") + (NATIVE.igLoggedIn() ? "" : " (در تنظیمات وارد اینستاگرام شو)")]);
   if (cache.remote && hasFavs() && !favsSynced())
