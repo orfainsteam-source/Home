@@ -1,5 +1,5 @@
 {
-  "updated": 1791642617408,
+  "updated": 1791644388770,
   "foreign": false,
   "feeds": [
     {
@@ -90,6 +90,12 @@
       "url": "https://www.cartoonbrew.com/feed",
       "cat": "animation",
       "on": false
+    },
+    {
+      "name": "viliden",
+      "url": "https://t.me/s/VilideNTV",
+      "cat": "game",
+      "on": true
     }
   ],
   "favs": {
