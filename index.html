@@ -568,6 +568,8 @@ dialog.sheet .sheet-in{min-height:min(72dvh,640px)}
   dialog#settings{width:min(760px,94vw)}
 }
 @media (min-width:1500px){ .hcard{width:330px} }
+
+.reader .r-hero-wrap > img.r-hero{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:cover;border-radius:0;margin:0}
 </style>
 </head>
 <body data-tab="all">
@@ -1689,8 +1691,9 @@ function srcRow(item){
   if (!item.search) r.insertAdjacentHTML("beforeend", VERIFIED);
   return r;
 }
+const fixImg = u => /bing\.com\/th/.test(u || "") ? u.replace(/&(w|h|c)=\d+/g, "") : u;   // تصویر بینگ بدون حاشیه‌ی سفید
 function cardImg(item, box){
-  const im = el("img"); im.src = item.img; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+  const im = el("img"); im.src = fixImg(item.img); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
   im.onerror = () => {
     const f = favBackdropFor(item);
     if (f && im.src !== f) { im.src = f; return; }
@@ -2108,6 +2111,64 @@ $("introGo").onclick = () => {
   $("intro").hidden = true;
 };
 
+/* ---------- full text on demand ----------
+   اگر جمع‌کننده متن کامل را نگرفته بود، صفحه‌ی خبر از راه r.jina.ai (که سایت‌های ایرانی را هم باز می‌کند)
+   خوانده می‌شود و Readability متن اصلی را از آن بیرون می‌کشد. نتیجه روی همین دستگاه نگه داشته می‌شود. */
+let liveFull = load("hn:live", {});
+let readabilityLoad = null;
+function loadReadability(){
+  if (window.Readability) return Promise.resolve();
+  if (!readabilityLoad) readabilityLoad = new Promise((res, rej) => {
+    const sc = document.createElement("script");
+    sc.src = "https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js";
+    sc.onload = res; sc.onerror = () => { readabilityLoad = null; rej(new Error("readability")); };
+    document.head.append(sc);
+  });
+  return readabilityLoad;
+}
+function htmlToBlocks(html, base){
+  const doc = new DOMParser().parseFromString("<div>" + html + "</div>", "text/html");
+  const out = [], seen = new Set();
+  const walk = node => {
+    for (const e of node.children){
+      const tag = e.tagName;
+      if (/^(P|H[2-4]|LI|BLOCKQUOTE)$/.test(tag)){
+        const x = (e.textContent || "").replace(/\s+/g, " ").trim();
+        if (x.length > 1) out.push({t: tag === "P" ? "p" : tag === "LI" ? "li" : tag === "BLOCKQUOTE" ? "q" : "h", x});
+      } else if (tag === "IMG" || tag === "FIGURE" || tag === "PICTURE"){
+        const im = tag === "IMG" ? e : e.querySelector("img");
+        let src = im && (im.getAttribute("src") || im.getAttribute("data-src") || "");
+        try { src = new URL(src, base).href; } catch { src = ""; }
+        if (/^https?:/.test(src) && !/\.svg/i.test(src) && !seen.has(src)){
+          seen.add(src); const cap = e.querySelector && e.querySelector("figcaption");
+          out.push({t:"img", s:src, x: cap ? cap.textContent.trim() : ""});
+        }
+      } else walk(e);
+    }
+  };
+  walk(doc.body.firstElementChild);
+  return out;
+}
+async function fetchFullNow(item){
+  try {
+    const [html] = await Promise.all([
+      fetchText("https://r.jina.ai/" + item.link, {headers:{"X-Return-Format":"html"}}, 40000),
+      loadReadability()
+    ]);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const base = doc.createElement("base"); base.href = item.link; doc.head.prepend(base);
+    const art = new window.Readability(doc, {charThreshold: 300}).parse();
+    if (!art || !art.content) return null;
+    const blocks = htmlToBlocks(art.content, item.link);
+    const words = blocks.filter(b => b.t !== "img").reduce((n, b) => n + b.x.split(" ").length, 0);
+    if (words < 60) return null;
+    liveFull[item.id] = blocks;
+    const keys = Object.keys(liveFull); if (keys.length > 25) for (const k of keys.slice(0, keys.length - 25)) delete liveFull[k];
+    save("hn:live", liveFull);
+    return blocks;
+  } catch { return null; }
+}
+
 /* ---------- reader ---------- */
 let readerSeq = 0, artTr = load("hn:art", {});
 async function gTranslate(text, item){
@@ -2147,7 +2208,7 @@ async function openReader(item){
   if (!item.search) rs.insertAdjacentHTML("beforeend", VERIFIED);
   rs.append(el("span", "t", ago(item.ts)));
   readerItem = item; paintSave();
-  const hero = $("rHero"); hero.hidden = !item.img; if (item.img) hero.src = item.img;
+  const hero = $("rHero"); hero.hidden = !item.img; if (item.img) hero.src = fixImg(item.img);
   hero.onerror = () => { hero.hidden = true; };
   const body = $("rBody"); body.textContent = "";
   const foot = $("rFoot"); foot.textContent = "";
@@ -2157,10 +2218,17 @@ async function openReader(item){
   dlg.scrollTop = 0;
   if (!t) translateAll();
 
-  let blocks = item.blocks && item.blocks.length ? item.blocks : null;
+  let blocks = item.blocks && item.blocks.length ? item.blocks : (liveFull[item.id] || null);
   if (!blocks && item.full && cache.remote){
     body.append(el("p", "pending", "در حال آوردن متن کامل…"));
     try { blocks = JSON.parse(await fetchText("data/a/" + item.id + ".json", {}, 15000)).blocks; } catch {}
+    if (my !== readerSeq) return;
+    body.textContent = "";
+  }
+  if ((!blocks || !blocks.length) && item.link && !/youtu\.?be|t\.me\//i.test(item.link)){
+    // متن کامل روی سرور نبود: همین حالا از خود سایت خبر بخوان
+    body.append(el("p", "pending", "در حال آوردن متن کامل از " + item.src + "…"));
+    blocks = await fetchFullNow(item);
     if (my !== readerSeq) return;
     body.textContent = "";
   }
