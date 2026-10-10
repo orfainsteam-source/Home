@@ -1,6 +1,6 @@
 {
-  "updated": 1791648475549,
-  "foreign": false,
+  "updated": 1791650542214,
+  "foreign": true,
   "feeds": [
     {
       "name": "ویجیاتو",
@@ -308,7 +308,8 @@
         "id": "Q1989672",
         "page": "https://www.wikidata.org/wiki/Q1989672",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       },
       {
         "name": "Rockstar Lincoln",
@@ -322,7 +323,8 @@
         "id": "Q1831780",
         "page": "https://www.wikidata.org/wiki/Q1831780",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       },
       {
         "name": "Rockstar Vancouver",
@@ -335,7 +337,8 @@
         "id": "Q2020713",
         "page": "https://www.wikidata.org/wiki/Q2020713",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       },
       {
         "name": "Rockstar London",
@@ -347,7 +350,8 @@
         "id": "Q2083043",
         "page": "https://www.wikidata.org/wiki/Q2083043",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       },
       {
         "name": "Electronic Arts",
@@ -360,7 +364,8 @@
         "id": "Q173941",
         "page": "https://www.wikidata.org/wiki/Q173941",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       }
     ]
   }
