@@ -435,6 +435,20 @@ results.forEach((r, i) => {
   if (!r || r.error){ console.log("FAILED", s.name, s.fav || "", r && r.error && r.error.message); if (!s.search) failed.push(s.name); return; }
   (s.search ? found : feedItems).push(...r);
 });
+// اگر برای علاقه‌مندی‌ای خبر فارسی کم بود (مثلاً یک انیمیشن یا استودیو خارجی)، از منابع خارجی کمک بگیر
+if (!FOREIGN){
+  const cnt = {}; for (const x of found) cnt[x.fav] = (cnt[x.fav] || 0) + 1;
+  const weak = favList.filter(([f]) => (cnt[f.name] || 0) < 4);
+  const extra = weak.flatMap(([f, cat]) => searchSources(f, cat));
+  const more = await pool(extra, 4, async src => {
+    const r = await get(src.url, {tries:3});
+    const terms = src.terms.map(norm).filter(t => t.trim());
+    return parseFeed(r.text, src).filter(x => terms.some(t => norm(x.title + " " + x.summary).includes(t)))
+      .sort((a, b) => b.ts - a.ts).slice(0, 8).map(x => ({...x, fallback:true}));
+  });
+  for (const r of more) if (Array.isArray(r)) found.push(...r);
+  console.log("foreign fallback for:", weak.map(([f]) => f.name).join(", ") || "none");
+}
 console.log("search results:", Object.entries(found.reduce((o, x) => (o[x.fav] = (o[x.fav] || 0) + 1, o), {})).map(e => e.join("=")).join(", "));
 
 feedItems = feedItems.sort((a, b) => b.ts - a.ts).slice(0, MAX_FEED_ITEMS);

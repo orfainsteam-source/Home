@@ -77,6 +77,11 @@ public class NewsWidget extends AppWidgetProvider {
         } catch (Exception ignored) { }
     }
 
+    static Intent action(Context ctx) {
+        return new Intent(ctx, WidgetAction.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION
+            | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+    }
+
     static RemoteViews build(Context ctx, int id, String status) {
         RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.widget);
 
@@ -96,9 +101,9 @@ public class NewsWidget extends AppWidgetProvider {
         Intent app = new Intent(ctx, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         v.setOnClickPendingIntent(R.id.w_mark, PendingIntent.getActivity(ctx, 2, app, PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE));
 
-        // به‌روزرسانی درجا (اپ باز نمی‌شود)
-        Intent refresh = new Intent(ctx, NewsWidget.class).setAction(ACTION_REFRESH);
-        PendingIntent rp = PendingIntent.getBroadcast(ctx, 3, refresh, PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
+        // به‌روزرسانی درجا (اپ باز نمی‌شود) — از راه اکتیویتی بی‌صفحه، تا روی همه‌ی گوشی‌ها کار کند
+        PendingIntent rp = PendingIntent.getActivity(ctx, 3, action(ctx).putExtra("what", "refresh")
+            .setData(Uri.parse("dashboard://refresh")), PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
         v.setOnClickPendingIntent(R.id.w_refresh, rp);
         v.setOnClickPendingIntent(R.id.w_updated, rp);
 
@@ -109,10 +114,10 @@ public class NewsWidget extends AppWidgetProvider {
             boolean on = CATS[i].equals(cur);
             v.setInt(CHIPS[i], "setBackgroundResource", on ? R.drawable.chip_on : R.drawable.chip_off);
             v.setTextColor(CHIPS[i], on ? onText : offText);
-            Intent ci = new Intent(ctx, NewsWidget.class).setAction(ACTION_CAT)
+            Intent ci = action(ctx).putExtra("what", "cat")
                 .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).putExtra("cat", CATS[i])
                 .setData(Uri.parse("dashboard://cat/" + id + "/" + CATS[i]));
-            v.setOnClickPendingIntent(CHIPS[i], PendingIntent.getBroadcast(ctx, 100 + id * 10 + i, ci, PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE));
+            v.setOnClickPendingIntent(CHIPS[i], PendingIntent.getActivity(ctx, 100 + id * 10 + i, ci, PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE));
         }
 
         v.setTextViewText(R.id.w_updated, status != null ? status : NewsWidgetService.lastUpdated(ctx));

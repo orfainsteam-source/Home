@@ -31,6 +31,15 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />
         </receiver>
 
+        <activity
+            android:name=".WidgetAction"
+            android:exported="false"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:launchMode="standard" />
+
         <service
             android:name=".NewsWidgetService"
             android:exported="false"

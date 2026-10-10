@@ -8,8 +8,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
 import android.webkit.JavascriptInterface;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +34,8 @@ public class MainActivity extends Activity {
     static final String HOST = "orfainsteam-source.github.io";
     static final String IG_LOGIN = "https://www.instagram.com/accounts/login/";
     private WebView web;
+    private ValueCallback<Uri[]> fileCb;   // انتخاب عکس پس‌زمینه از گالری
+    static final int PICK = 41;
     private boolean igMode = false;   // در حال ورود به اینستاگرام داخل اپ
     private boolean ytMode = false;   // در حال ورود به حساب گوگل/یوتیوب داخل اپ
     static final String YT_LOGIN = "https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fm.youtube.com%2F";
@@ -126,6 +130,30 @@ public class MainActivity extends Activity {
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
         web.addJavascriptInterface(new Bridge(), "HomeNative");
 
+        web.setWebChromeClient(new WebChromeClient() {
+            View full; CustomViewCallback fullCb;
+            // تمام‌صفحه برای تریلرها
+            @Override public void onShowCustomView(View v, CustomViewCallback cb) {
+                if (full != null) { cb.onCustomViewHidden(); return; }
+                full = v; fullCb = cb;
+                ((ViewGroup) getWindow().getDecorView()).addView(v, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+            @Override public void onHideCustomView() {
+                if (full == null) return;
+                ((ViewGroup) getWindow().getDecorView()).removeView(full);
+                full = null; if (fullCb != null) fullCb.onCustomViewHidden(); fullCb = null;
+            }
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> cb, FileChooserParams params) {
+                if (fileCb != null) fileCb.onReceiveValue(null);
+                fileCb = cb;
+                Intent pick = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
+                try { startActivityForResult(Intent.createChooser(pick, "انتخاب عکس"), PICK); }
+                catch (ActivityNotFoundException e) { fileCb = null; return false; }
+                return true;
+            }
+        });
+
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
@@ -189,6 +217,16 @@ public class MainActivity extends Activity {
         if (read != null) web.loadUrl(HOME + "#read=" + Uri.encode(read));
         else if (state != null) web.restoreState(state);
         else web.loadUrl(HOME);
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req != PICK || fileCb == null) return;
+        Uri[] out = null;
+        if (res == RESULT_OK && data != null && data.getData() != null) out = new Uri[]{ data.getData() };
+        fileCb.onReceiveValue(out);
+        fileCb = null;
     }
 
     @Override
