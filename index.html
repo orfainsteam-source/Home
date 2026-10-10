@@ -410,7 +410,8 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند. پیج‌های اینستاگرام بخش جدای خودشان را دارند.</p>
     </details>
 
-    <details class="srcs" id="igSrcBox">
+    <div class="quick-state" id="quickState"></div>
+    <details class="srcs" id="igSrcBox" hidden>
     <summary id="igSum">پیج‌های اینستاگرام</summary>
     <div id="igList"></div>
     <div class="add">
@@ -420,7 +421,6 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <button class="btn ghost full" id="igAdd" type="button">افزودن پیج</button>
     </div>
     <p class="hint">لینک یا آیدی پیج‌های عمومی، مثل پیج رسمی بازی‌ها و استودیوها. پست‌هایشان بدون ورود به حساب خوانده می‌شود.</p>
-    <div class="quick-state" id="quickState"></div>
     <div id="igBox" hidden>
       <div class="gh-state" id="igState"></div>
       <button class="btn ghost" id="igLogin" type="button" style="margin-top:8px">ورود به اینستاگرام (فقط اگر پیجی خوانده نشد)</button>
@@ -682,6 +682,13 @@ if ((settings.defaultsVersion || 1) < DEFAULTS_VERSION){
   save("hn:settings", settings);
 }
 let cache = load("hn:items", {ts:0, items:[], failed:[]});
+let igRemoved = false;
+if (settings.feeds.some(f => /instagram\.com/i.test(f.url))){
+  settings.feeds = settings.feeds.filter(f => !/instagram\.com/i.test(f.url));
+  settings.cfgUpdated = Date.now(); igRemoved = true; save("hn:settings", settings);
+}
+cache.items = (cache.items || []).filter(x => !/instagram\.com\//i.test(x.link || ""));
+try { localStorage.removeItem("hn:ig"); } catch {}
 let tr = load("hn:tr", {});
 let tab = "all", query = "", busy = false, favPick = "";
 
@@ -907,7 +914,7 @@ async function loadRemoteConfig(){
     remoteCfg = c;
     if ((c.updated || 0) > (settings.cfgUpdated || 0)){
       if (c.favs) settings.favs = c.favs;
-      if (c.feeds && c.feeds.length) settings.feeds = c.feeds;
+      if (c.feeds && c.feeds.length) settings.feeds = c.feeds.filter(f => !/instagram\.com/i.test(f.url));
       if ("foreign" in c) settings.foreign = !!c.foreign;
       settings.cfgUpdated = c.updated; favMemo = new Map(); save("hn:settings", settings);
       return true;
@@ -931,7 +938,7 @@ function watchForUpdate(sinceTs, note){
   }, 30000);
 }
 function applyData(d){
-  cache = {ts:d.ts, items:d.items, failed:d.failed || [], fetched:Date.now(), remote:true};
+  cache = {ts:d.ts, items:d.items.filter(x => !/instagram\.com\//i.test(x.link || "")), failed:(d.failed || []).filter(n => !/instagram/i.test(n)), fetched:Date.now(), remote:true};
   mergeIg();
   favMemo = new Map(); save("hn:items", cache);
   renderTabs(); render(); translateAll(); tryPendingRead();
@@ -1081,7 +1088,7 @@ function renderTabs(){
   for (const x of cache.items) used.add(x.cat);
   for (const [c, l] of Object.entries(settings.favs || {})) if (l.length) used.add(c);
   const list = [["all","همه",""], ...Object.entries(CATS).filter(([k]) => used.has(k)).map(([k, v]) => [k, v.label, v.color])];
-  if (cache.items.some(isIgItem) || settings.feeds.some(f => f.on && /instagram\.com/i.test(f.url))) list.push(["ig", "اینستاگرام", "#E1306C"]);
+
   if (!list.some(([k]) => k === tab)) tab = "all";
   document.body.dataset.tab = (tab === "game" || tab === "anime") ? tab : "all";
   const box = $("tabs"); box.textContent = "";
@@ -1351,8 +1358,8 @@ function setStatus(msg, trFails = 0){
   const failedNow = (cache.failed || []).filter(n => !igNames.has(n));
   const igOnlyApp = (cache.failed || []).filter(n => igNames.has(n));
   if (failedNow.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + failedNow.join("، ")]);
-  if (igOnlyApp.length && !NATIVE) parts.push(["", "پست‌های " + igOnlyApp.join("، ") + " فقط در اپ اندروید نشان داده می‌شود"]);
-  if (NATIVE && cache.igFailed && cache.igFailed.length)
+
+  if (false)
     parts.push(["warn", "این پیج‌های اینستاگرام خوانده نشدند: " + cache.igFailed.join("، ") + (NATIVE.igLoggedIn() ? "" : " (در تنظیمات وارد اینستاگرام شو)")]);
   if (cache.remote && hasFavs() && !favsSynced())
     parts.push(["warn", settings.ghToken ? "علاقه‌مندی‌ها هنوز به جمع‌کننده نرسیده‌اند؛ چند دقیقه صبر کن"
@@ -1370,7 +1377,7 @@ const nativeGet = url => new Promise((res, rej) => {
   setTimeout(() => { if (nativeWait[id]){ delete nativeWait[id]; rej(new Error("timeout")); } }, 30000);
   NATIVE.request(id, url);
 });
-const igFeeds = () => settings.feeds.filter(f => f.on && /instagram\.com/i.test(f.url) && (!cache.remote || (cache.failed || []).includes(f.name)));
+const igFeeds = () => [];   // اینستاگرام حذف شد
 const igUser = f => (f.url.match(/instagram\.com\/([A-Za-z0-9_.]+)/i) || [])[1];
 let igCache = load("hn:ig", {ts:0, items:[], failed:[]});
 function igToItems(json, feed){
@@ -1909,7 +1916,7 @@ $("addFeed").onclick = () => {
   const handle = (url.match(/^@?([A-Za-z0-9_.]{2,})\/?$/) || [])[1];
   const tg = url.match(/^(?:@|(?:https?:\/\/)?(?:t|telegram)\.me\/(?:s\/)?)([A-Za-z0-9_]{4,})\/?$/i);
   const ig = url.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([A-Za-z0-9_.]+)\/?/i);
-  if (ig || (type === "ig" && handle)) url = "https://www.instagram.com/" + (ig ? ig[1] : handle) + "/";
+  if (ig){ $("newUrl").value = ""; $("newUrl").placeholder = "اینستاگرام پشتیبانی نمی‌شود"; $("newUrl").focus(); return; }
   else if (tg || (type === "tg" && handle)) url = "https://t.me/s/" + (tg ? tg[1] : handle);
   if (!name || !safeUrl(url)){ $("newUrl").focus(); return; }
   draft.feeds.push({name, url, cat:$("newCat").value, on:true});
@@ -1982,7 +1989,7 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 /* ---------- start ---------- */
 applyTheme(); applyBg(); paintHeader(); renderTabs(); render(); tryPendingRead();
 loadRemoteConfig().then(changed => {
-  if (migratedFeeds && settings.ghToken) pushConfig().catch(() => {});
+  if ((migratedFeeds || igRemoved) && settings.ghToken) pushConfig().catch(() => {});
   if (NATIVE) refreshInstagram(false);
   if (NATIVE && NATIVE.setToken) NATIVE.setToken(settings.ghToken || "");
   loadReleases(); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
