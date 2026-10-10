@@ -1,5 +1,5 @@
 {
-  "updated": 1791650542214,
+  "updated": 1791650640225,
   "foreign": true,
   "feeds": [
     {
@@ -94,12 +94,6 @@
     {
       "name": "viliden",
       "url": "https://t.me/s/VilideNTV",
-      "cat": "game",
-      "on": true
-    },
-    {
-      "name": "GamePlayIran",
-      "url": "https://t.me/s/GamePlayIranChannel",
       "cat": "game",
       "on": true
     }
