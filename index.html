@@ -857,23 +857,45 @@ const GH = (() => {
   const repo = location.pathname.split("/").filter(Boolean)[0];
   return m && repo ? {owner:m[1], repo} : {owner:"orfainsteam-source", repo:"Home"};
 })();
+// توکن کپی‌شده از تلگرام و… ممکن است نویسه‌ی نامرئی داشته باشد؛ فقط حروف مجاز توکن نگه داشته می‌شود
+const cleanToken = t => String(t || "").replace(/[^A-Za-z0-9_]/g, "");
 async function ghApi(path, opts = {}){
   const r = await fetch("https://api.github.com/repos/" + GH.owner + "/" + GH.repo + path, {...opts,
-    headers:{Authorization:"Bearer " + settings.ghToken, Accept:"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28"}});
+    headers:{Authorization:"Bearer " + cleanToken(settings.ghToken), Accept:"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28"}});
   if (!r.ok){ const e = new Error("HTTP " + r.status); e.status = r.status; throw e; }
   return r.status === 204 ? null : r.json();
 }
 function b64(str){ const b = new TextEncoder().encode(str); let s = ""; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
-async function pushConfig(){
-  const body = JSON.stringify({updated: settings.cfgUpdated || Date.now(), foreign: !!settings.foreign, feeds: settings.feeds, favs: settings.favs || {}}, null, 2) + "\n";
-  let sha;
-  try { sha = (await ghApi("/contents/config/config.json?ref=main")).sha; } catch(e){ if (e.status !== 404) throw e; }
-  await ghApi("/contents/config/config.json", {method:"PUT", body: JSON.stringify({message:"Update favourites", content:b64(body), sha, branch:"main"})});
+/* ذخیره‌ها پشت سر هم انجام می‌شوند، نه هم‌زمان. اگر دو ذخیره با هم برسند، دومی با نسخه‌ی کهنه‌ی فایل
+   رد می‌شد (خطای 409) و پیغام «اتصال برقرار نشد» می‌آمد، با این‌که اولی ذخیره شده بود. */
+let pushChain = Promise.resolve();
+function pushConfig(){
+  const run = pushChain.then(pushConfigNow, pushConfigNow);
+  pushChain = run.catch(() => {});
+  return run;
+}
+async function pushConfigNow(){
+  for (let attempt = 0; ; attempt++){
+    const body = JSON.stringify({updated: settings.cfgUpdated || Date.now(), foreign: !!settings.foreign, feeds: settings.feeds, favs: settings.favs || {}}, null, 2) + "\n";
+    let sha;
+    try { sha = (await ghApi("/contents/config/config.json?ref=main&t=" + Date.now())).sha; } catch(e){ if (e.status !== 404) throw e; }
+    try {
+      await ghApi("/contents/config/config.json", {method:"PUT", body: JSON.stringify({message:"Update favourites", content:b64(body), sha, branch:"main"})});
+      return;
+    } catch(e){
+      if ((e.status === 409 || e.status === 422) && attempt < 3){ await new Promise(r => setTimeout(r, 1200 * (attempt + 1))); continue; }
+      throw e;
+    }
+  }
 }
 async function requestCollect(){
   await ghApi("/actions/workflows/collect.yml/dispatches", {method:"POST", body: JSON.stringify({ref:"main"})});
 }
-const ghErr = e => e.status === 401 ? "توکن نامعتبر یا منقضی است" : e.status === 403 || e.status === 404 ? "توکن اجازه‌ی کافی ندارد" : "اتصال به GitHub برقرار نشد";
+const ghErr = e => e.status === 401 ? "توکن نامعتبر یا منقضی است؛ یک توکن تازه بساز"
+                 : e.status === 403 || e.status === 404 ? "توکن اجازه‌ی کافی ندارد"
+                 : e.status === 409 || e.status === 422 ? "هم‌زمان با یک ذخیره‌ی دیگر شد؛ چند ثانیه بعد دوباره ذخیره کن"
+                 : e.status ? "GitHub خطای " + e.status + " داد"
+                 : "اتصال به GitHub برقرار نشد (VPN را چک کن)";
 // نسخه‌ی مخزن از تنظیمات، اگر جدیدتر از نسخه‌ی این مرورگر باشد، جایگزین می‌شود
 let remoteCfg = null;
 // آیا علاقه‌مندی‌های این مرورگر همان‌هایی است که جمع‌کننده می‌شناسد؟
@@ -1898,7 +1920,7 @@ $("saveSettings").onclick = () => {
   draft.engine = r ? r.value : "google";
   draft.geminiKey = $("gKey").value.trim(); draft.geminiModel = $("gModel").value.trim() || DEFAULTS.geminiModel;
   draft.theme = $("theme").value;
-  draft.ghToken = $("ghToken").value.trim();
+  draft.ghToken = cleanToken($("ghToken").value);
   const foreignChanged = !!draft.foreign !== $("foreign").checked;
   draft.foreign = $("foreign").checked;
   for (const k of Object.keys(draft.favs)) if (!draft.favs[k].length) delete draft.favs[k];
@@ -1930,7 +1952,7 @@ $("settings").addEventListener("close", () => applyBg());   // پیش‌نمای
 $("settings").addEventListener("cancel", e => { if (document.activeElement && document.activeElement.getAttribute("aria-expanded") === "true") e.preventDefault(); });
 $("settingsBtn").onclick = openSettings;
 $("ghToken").onchange = async () => {
-  const st = $("ghState"), tok = $("ghToken").value.trim();
+  const st = $("ghState"), tok = cleanToken($("ghToken").value);
   st.className = "gh-state"; st.textContent = tok ? "در حال بررسی…" : "";
   if (!tok) return;
   try {
