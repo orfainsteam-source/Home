@@ -1,5 +1,5 @@
 {
-  "updated": 1791656669449,
+  "updated": 1791656817416,
   "foreign": true,
   "feeds": [
     {
@@ -94,18 +94,6 @@
     {
       "name": "viliden",
       "url": "https://t.me/s/VilideNTV",
-      "cat": "game",
-      "on": true
-    },
-    {
-      "name": "Fromsoftware",
-      "url": "https://www.instagram.com/fromsoftware_pr/",
-      "cat": "game",
-      "on": true
-    },
-    {
-      "name": "fromsoftware",
-      "url": "https://www.instagram.com/fromsoftware_jp/",
       "cat": "game",
       "on": true
     }
@@ -284,19 +272,6 @@
         "imdb": "https://www.imdb.com/title/tt0434665/",
         "imdbExact": true,
         "bg": ""
-      },
-      {
-        "name": "Attack on Titan",
-        "terms": [
-          "Attack on Titan",
-          "Shingeki no Kyojin"
-        ],
-        "src": "anilist",
-        "id": 16498,
-        "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx16498-buvcRTBx4NSm.jpg",
-        "page": "https://anilist.co/anime/16498",
-        "imdb": "https://www.imdb.com/title/tt2560140/",
-        "imdbExact": true
       }
     ],
     "studio": [
@@ -398,7 +373,8 @@
         "img": "https://static.tvmaze.com/uploads/images/medium_portrait/626/1566363.jpg",
         "page": "https://www.tvmaze.com/shows/216/rick-and-morty",
         "imdb": "https://www.imdb.com/title/tt2861424/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://static.tvmaze.com/uploads/images/original_untouched/90/225679.jpg"
       }
     ]
   }
