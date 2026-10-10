@@ -1,5 +1,6 @@
 {
-  "updated": 1791638468928,
+  "updated": 1791640085250,
+  "foreign": false,
   "feeds": [
     {
       "name": "ویجیاتو",
@@ -104,7 +105,8 @@
         "id": "Q771541",
         "page": "https://www.wikidata.org/wiki/Q771541",
         "imdb": "https://www.imdb.com/title/tt2290962/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570/library_hero.jpg"
       },
       {
         "name": "Elden Ring",
@@ -115,7 +117,8 @@
         "id": "Q64826862",
         "page": "https://www.wikidata.org/wiki/Q64826862",
         "imdb": "https://www.imdb.com/title/tt10562854/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_hero.jpg"
       },
       {
         "name": "Grand Theft Auto VI",
@@ -129,7 +132,8 @@
         "id": "Q23648408",
         "page": "https://www.wikidata.org/wiki/Q23648408",
         "imdb": "https://www.imdb.com/title/tt18282598/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       },
       {
         "name": "Mafia",
@@ -140,7 +144,8 @@
         "id": "Q21526531",
         "page": "https://www.wikidata.org/wiki/Q21526531",
         "imdb": "",
-        "imdbExact": false
+        "imdbExact": false,
+        "bg": ""
       },
       {
         "name": "Mafia II",
@@ -152,7 +157,8 @@
         "id": "Q59154",
         "page": "https://www.wikidata.org/wiki/Q59154",
         "imdb": "https://www.imdb.com/title/tt1181833/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/50130/library_hero.jpg"
       },
       {
         "name": "Mafia III",
@@ -164,7 +170,8 @@
         "id": "Q20737889",
         "page": "https://www.wikidata.org/wiki/Q20737889",
         "imdb": "https://www.imdb.com/title/tt4936406/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/360430/library_hero.jpg"
       },
       {
         "name": "Mafia: The Old Country",
@@ -175,7 +182,8 @@
         "id": "Q111272660",
         "page": "https://www.wikidata.org/wiki/Q111272660",
         "imdb": "https://www.imdb.com/title/tt33238076/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1941540/library_hero.jpg"
       },
       {
         "name": "God of War",
@@ -188,7 +196,8 @@
         "id": "Q817369",
         "page": "https://www.wikidata.org/wiki/Q817369",
         "imdb": "https://www.imdb.com/title/tt0416779/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       },
       {
         "name": "God of War II",
@@ -200,7 +209,8 @@
         "id": "Q2252689",
         "page": "https://www.wikidata.org/wiki/Q2252689",
         "imdb": "https://www.imdb.com/title/tt0846694/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       },
       {
         "name": "Phantom Blade Zero",
@@ -212,7 +222,8 @@
         "id": "Q118645482",
         "page": "https://www.wikidata.org/wiki/Q118645482",
         "imdb": "https://www.imdb.com/title/tt27916716/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       }
     ],
     "anime": [
@@ -227,7 +238,8 @@
         "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx151807-it355ZgzquUd.png",
         "page": "https://anilist.co/anime/151807",
         "imdb": "https://www.imdb.com/title/tt21209876/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       },
       {
         "name": "Tokyo Revengers",
@@ -239,7 +251,8 @@
         "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx120120-cWDmnmeEntSe.jpg",
         "page": "https://anilist.co/anime/120120",
         "imdb": "https://www.imdb.com/title/tt13196080/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
       },
       {
         "name": "Bleach",
@@ -251,9 +264,25 @@
         "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx269-d2GmRkJbMopq.png",
         "page": "https://anilist.co/anime/269",
         "imdb": "https://www.imdb.com/title/tt0434665/",
-        "imdbExact": true
+        "imdbExact": true,
+        "bg": ""
+      }
+    ],
+    "studio": [
+      {
+        "name": "FromSoftware",
+        "terms": [
+          "FromSoftware",
+          "FromSoftware, Inc.",
+          "From Software"
+        ],
+        "src": "wikidata",
+        "id": "Q2414469",
+        "page": "https://www.wikidata.org/wiki/Q2414469",
+        "imdb": "",
+        "imdbExact": false,
+        "bg": ""
       }
     ]
-  },
-  "foreign": false
+  }
 }
