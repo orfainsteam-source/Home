@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="bg">#1B1736</color>
+    <color name="w_bg">#15122B</color>
+    <color name="w_text">#F1EEFF</color>
+    <color name="w_muted">#A49FC4</color>
+    <color name="w_line">#26FFFFFF</color>
+    <color name="w_accent">#5CE1E6</color>
+    <color name="w_fav">#FF7AB6</color>
 </resources>

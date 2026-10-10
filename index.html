@@ -775,7 +775,7 @@ function applyData(d){
   cache = {ts:d.ts, items:d.items, failed:d.failed || [], fetched:Date.now(), remote:true};
   mergeIg();
   favMemo = new Map(); save("hn:items", cache);
-  renderTabs(); render(); translateAll();
+  renderTabs(); render(); translateAll(); tryPendingRead();
 }
 
 async function refresh(manual){
@@ -1314,6 +1314,15 @@ async function openReader(item){
   await Promise.all([worker(), worker(), worker()]);
   if (my === readerSeq && artTr[item.id]) saveArtTr(item.id);
 }
+// باز کردن یک خبر از بیرون (ویجت اپ اندروید): #read=<id>
+let pendingRead = (location.hash.match(/^#read=(.+)$/) || [])[1] || "";
+if (pendingRead){ pendingRead = decodeURIComponent(pendingRead); history.replaceState(null, "", location.pathname + location.search); }
+function tryPendingRead(){
+  if (!pendingRead) return;
+  const it = cache.items.find(x => x.id === pendingRead);
+  if (it){ pendingRead = ""; openReader(it); }
+}
+window.__openRead = id => { pendingRead = id; tryPendingRead(); };
 $("igLogin").onclick = () => { if (NATIVE) NATIVE.openInstagramLogin(); };
 $("rClose").onclick = () => $("reader").close();
 $("reader").addEventListener("close", () => { readerSeq++; });
@@ -1537,7 +1546,7 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 })();
 
 /* ---------- start ---------- */
-applyTheme(); paintHeader(); renderTabs(); render();
+applyTheme(); paintHeader(); renderTabs(); render(); tryPendingRead();
 loadRemoteConfig().then(changed => {
   if (migratedFeeds && settings.ghToken) pushConfig().catch(() => {});
   if (NATIVE) refreshInstagram(false); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });

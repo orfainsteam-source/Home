@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dashboard</string>
+    <string name="widget_desc">تازه‌ترین خبرهای علاقه‌مندی‌هایت</string>
+    <string name="widget_empty">در حال گرفتن خبرها…</string>
+    <string name="widget_refresh">به‌روزرسانی</string>
 </resources>

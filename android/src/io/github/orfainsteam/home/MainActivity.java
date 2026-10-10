@@ -150,8 +150,25 @@ public class MainActivity extends Activity {
             }
         });
 
-        if (state != null) web.restoreState(state);
+        String read = getIntent() == null ? null : getIntent().getStringExtra("read");
+        if (read != null) web.loadUrl(HOME + "#read=" + Uri.encode(read));
+        else if (state != null) web.restoreState(state);
         else web.loadUrl(HOME);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        final String read = intent.getStringExtra("read");
+        if (read == null) return;
+        // اپ باز است: همان خبر را در صفحه باز کن
+        String js = "window.__openRead ? (window.__openRead(" + org.json.JSONObject.quote(read) + "), 1) : 0";
+        web.evaluateJavascript(js, new ValueCallback<String>() {
+            @Override public void onReceiveValue(String v) {
+                if (!"1".equals(v)) web.loadUrl(HOME + "#read=" + Uri.encode(read));
+            }
+        });
     }
 
     private void goHome() {
@@ -195,7 +212,10 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onPause() { super.onPause(); web.onPause(); CookieManager.getInstance().flush(); }
+    protected void onPause() {
+        super.onPause(); web.onPause(); CookieManager.getInstance().flush();
+        sendBroadcast(new Intent(this, NewsWidget.class).setAction(NewsWidget.ACTION_REFRESH));
+    }
 
     @Override
     protected void onResume() {

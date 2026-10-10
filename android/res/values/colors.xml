@@ -2,4 +2,10 @@
 <resources>
     <color name="bg">#F4F2FF</color>
     <color name="icon_bg">#15122B</color>
+    <color name="w_bg">#F7F5FF</color>
+    <color name="w_text">#1B1736</color>
+    <color name="w_muted">#6E6890</color>
+    <color name="w_line">#1F1B1736</color>
+    <color name="w_accent">#0E9AA0</color>
+    <color name="w_fav">#D5508E</color>
 </resources>
