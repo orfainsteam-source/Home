@@ -13,18 +13,21 @@ const SITE = (process.env.SITE_URL || "").replace(/\/$/, "");
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36";
 
 const DEFAULT_FEEDS = [
-  {name:"IGN", url:"https://feeds.feedburner.com/ign/news", cat:"game", on:true},
-  {name:"GameSpot", url:"https://www.gamespot.com/feeds/news/", cat:"game", on:true},
-  {name:"PC Gamer", url:"https://www.pcgamer.com/rss/", cat:"game", on:true},
-  {name:"Polygon", url:"https://www.polygon.com/rss/index.xml", cat:"game", on:true},
-  {name:"Eurogamer", url:"https://www.eurogamer.net/feed", cat:"game", on:false},
-  {name:"Anime News Network", url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:true},
-  {name:"MyAnimeList", url:"https://myanimelist.net/rss/news.xml", cat:"anime", on:true},
-  {name:"Anime Corner", url:"https://animecorner.me/feed/", cat:"anime", on:true},
-  {name:"Cartoon Brew", url:"https://www.cartoonbrew.com/feed", cat:"animation", on:true},
-  {name:"ویجیاتو", url:"https://t.me/s/vigiatonet", cat:"game", on:true, lang:"fa"}
+  {name:"ویجیاتو", url:"https://t.me/s/vigiatonet", cat:"game", on:true, lang:"fa"},
+  {name:"زومجی", url:"https://t.me/s/myzoomg", cat:"game", on:true, lang:"fa"},
+  {name:"گیمفا", url:"https://t.me/s/gamefa_official", cat:"game", on:true, lang:"fa"},
+  {name:"آقای انیمه", url:"https://t.me/s/animestertv", cat:"anime", on:true, lang:"fa"},
+  {name:"MyAnimes", url:"https://t.me/s/MyAnimes", cat:"anime", on:true, lang:"fa"},
+  {name:"IGN", url:"https://feeds.feedburner.com/ign/news", cat:"game", on:false},
+  {name:"GameSpot", url:"https://www.gamespot.com/feeds/news/", cat:"game", on:false},
+  {name:"PC Gamer", url:"https://www.pcgamer.com/rss/", cat:"game", on:false},
+  {name:"Polygon", url:"https://www.polygon.com/rss/index.xml", cat:"game", on:false},
+  {name:"Anime News Network", url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:false},
+  {name:"MyAnimeList", url:"https://myanimelist.net/rss/news.xml", cat:"anime", on:false},
+  {name:"Cartoon Brew", url:"https://www.cartoonbrew.com/feed", cat:"animation", on:false}
 ];
-const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], animation:["animated","series","season"], tech:["tech"], other:[]};
+const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], animation:["animated","series","season"], studio:["game","studio"], tech:["tech"], other:[]};
+const CAT_FA = {game:"بازی", anime:"انیمه", animation:"انیمیشن", studio:"بازی", tech:"", other:""};
 const PER_FEED = 20, PER_SEARCH = 15, MAX_FEED_ITEMS = 160, SEARCH_DAYS = 30;
 const ARTICLE_BUDGET = 160;           // سقف خبرهای تازه‌ای که در هر اجرا متن کاملشان گرفته می‌شود
 const BLOCKED = /(^|\.)(polymarket\.com|msn\.com|youtube\.com|tiktok\.com|facebook\.com|x\.com|twitter\.com|reddit\.com)$/i;
@@ -111,7 +114,8 @@ function parseTelegram(page, feed){
     if (!lines.length) return null;
     const title = lines[0].slice(0, 220);
     const paras = lines.slice(1);
-    const img = (m.match(/tgme_widget_message_photo_wrap[^>]*background-image:url\('([^']+)'\)/) || [])[1] || "";
+    const img = (m.match(/tgme_widget_message_(?:photo_wrap|video_thumb)[^>]*background-image:url\('([^']+)'\)/) || [])[1]
+             || (m.match(/link_preview_(?:right_)?image[^>]*background-image:url\('([^']+)'\)/) || [])[1] || "";
     const site = (m.match(/href="(https?:\/\/(?!t\.me)[^"]+)"/) || [])[1] || "";
     const ts = Date.parse((m.match(/<time datetime="([^"]+)"/) || [])[1] || "") || 0;
     return {title, summary: clip(paras.join(" "), 300), link: ent(site) || "https://t.me/" + post, img: okUrl(img), ts, src: feed.name, cat: feed.cat,
@@ -130,6 +134,70 @@ function searchSources(fav, cat){
   ].map(x => ({...x, cat, fav:fav.name, terms:fav.terms, search:true}));
 }
 
+/* ---------- Persian web search (Bing, Persian edition) ---------- */
+const toFaDigits = t => t.replace(/[0-9]/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const toEnDigits = t => t.replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+const hasFa = t => /[\u0600-\u06FF]/.test(t || "");
+function persianSources(fav, cat, meta){
+  const fa = [...new Set((meta.fa || []).flatMap(n => [n, toFaDigits(n), toEnDigits(n)]))];
+  const qs = [];
+  if (fa.length) qs.push('"' + fa[0] + '"' + (CAT_FA[cat] ? " " + CAT_FA[cat] : ""));
+  qs.push('"' + fav.name.replace(/"/g, "") + '"' + (CAT_FA[cat] ? " " + CAT_FA[cat] : ""));
+  return qs.map(q => ({name:"Bing", url:"https://www.bing.com/news/search?q=" + encodeURIComponent(q) + "&format=rss&setlang=fa&cc=IR&qft=" + encodeURIComponent('sortbydate="1"'),
+    cat, fav:fav.name, terms:[...fav.terms, ...fa], search:true, persian:true}));
+}
+
+/* ---------- favourite metadata: Persian names, Steam id, official site, cover art ---------- */
+const ART_STEAM = id => "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/" + id + "/library_hero.jpg";
+const WD_RE = {game:/video game|game series|franchise/i, anime:/anime|manga|television series/i, animation:/animated|television series|cartoon/i,
+               studio:/developer|publisher|studio|company|video game/i};
+async function wdEntity(id){
+  return (await json("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=labels|aliases|claims&languages=fa|en&ids=" + id)).entities[id];
+}
+async function favMeta(fav, cat){
+  const meta = {fa:[], steam:"", site:"", art:""};
+  try {
+    let wid = fav.src === "wikidata" ? fav.id : "";
+    if (!wid && fav.src === "anilist" && fav.id){
+      const q = `SELECT ?i WHERE { { ?i wdt:P8729 "${+fav.id}" } } LIMIT 1`;
+      const r = await json("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(q), {headers:{Accept:"application/sparql-results+json"}});
+      const b = r.results.bindings[0]; if (b) wid = b.i.value.split("/").pop();
+    }
+    if (!wid){
+      const r = await json("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&type=item&limit=8&language=en&search=" + encodeURIComponent(fav.name));
+      const hit = (r.search || []).find(x => (WD_RE[cat] || /./).test(x.description || ""));
+      if (hit) wid = hit.id;
+    }
+    if (wid){
+      const e = await wdEntity(wid);
+      const v = p => { const c = (e.claims[p] || [])[0]; return c && c.mainsnak.datavalue ? c.mainsnak.datavalue.value : ""; };
+      if (e.labels.fa) meta.fa.push(e.labels.fa.value);
+      for (const a of (e.aliases && e.aliases.fa) || []) meta.fa.push(a.value);
+      meta.steam = String(v("P1733") || ""); meta.site = v("P856") || "";
+    }
+    if (fav.src === "anilist" && fav.id){
+      const d = await json("https://graphql.anilist.co", {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({query:"query($id:Int){Media(id:$id){bannerImage coverImage{extraLarge} externalLinks{site url}}}", variables:{id:+fav.id}})});
+      const m = d.data.Media;
+      meta.art = m.bannerImage || (m.coverImage && m.coverImage.extraLarge) || "";
+      if (!meta.site) meta.site = ((m.externalLinks || []).find(l => l.site === "Official Site") || {}).url || "";
+    } else if (fav.src === "tvmaze" && fav.id){
+      const imgs = await json("https://api.tvmaze.com/shows/" + fav.id + "/images");
+      const pick = imgs.find(x => x.type === "background") || imgs.find(x => x.type === "poster");
+      if (pick) meta.art = pick.resolutions.original.url;
+      if (!meta.site) meta.site = (await json("https://api.tvmaze.com/shows/" + fav.id)).officialSite || "";
+    }
+    if (!meta.steam && (cat === "game")){
+      const d = await json("https://store.steampowered.com/api/storesearch/?l=english&cc=US&term=" + encodeURIComponent(fav.name));
+      const want = norm(fav.name).trim(); const hit = (d.items || []).find(x => norm(x.name).trim() === want);
+      if (hit) meta.steam = String(hit.id);
+    }
+    if (meta.steam && !meta.art) meta.art = ART_STEAM(meta.steam);
+  } catch(e){ console.log("meta failed", fav.name, e.message); }
+  meta.fa = [...new Set(meta.fa.filter(n => n && n.length >= 2))];
+  return meta;
+}
+
 /* ---------- official sources: Steam news and the official site's own feed ---------- */
 async function json(url, opts){ return JSON.parse((await get(url, {tries:2, ms:15000, ...opts})).text); }
 async function discoverFeed(site){
@@ -144,31 +212,10 @@ async function discoverFeed(site){
   } catch {}
   return "";
 }
-async function officialSources(fav, cat){
-  let steam = "", site = "";
-  try {
-    if (fav.src === "wikidata" && fav.id){
-      const e = (await json("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims&ids=" + fav.id)).entities[fav.id];
-      const v = p => { const c = (e.claims[p] || [])[0]; return c && c.mainsnak.datavalue ? c.mainsnak.datavalue.value : ""; };
-      steam = v("P1733"); site = v("P856");
-    } else if (fav.src === "anilist" && fav.id){
-      const d = await json("https://graphql.anilist.co", {method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({query:"query($id:Int){Media(id:$id){externalLinks{site url}}}", variables:{id:+fav.id}})});
-      site = ((d.data.Media.externalLinks || []).find(l => l.site === "Official Site") || {}).url || "";
-    } else if (fav.src === "tvmaze" && fav.id){
-      site = (await json("https://api.tvmaze.com/shows/" + fav.id)).officialSite || "";
-    }
-    // بازی‌ای که دستی اضافه شده: شناسه‌ی Steam را از جست‌وجوی فروشگاه پیدا کن
-    if (!steam && cat === "game"){
-      const d = await json("https://store.steampowered.com/api/storesearch/?l=english&cc=US&term=" + encodeURIComponent(fav.name));
-      const want = norm(fav.name).trim();
-      const hit = (d.items || []).find(x => norm(x.name).trim() === want);
-      if (hit) steam = String(hit.id);
-    }
-  } catch(e){ console.log("official lookup failed", fav.name, e.message); }
+async function officialSources(fav, cat, meta){
   const out = [];
-  if (/^\d+$/.test(steam || "")) out.push({name:"Steam", url:"https://store.steampowered.com/feeds/news/app/" + steam + "/?l=english"});
-  if (site){ const feed = await discoverFeed(site); if (feed) out.push({name: host(site), url: feed}); }
+  if (/^\d+$/.test(meta.steam || "")) out.push({name:"Steam", url:"https://store.steampowered.com/feeds/news/app/" + meta.steam + "/?l=english"});
+  if (meta.site){ const feed = await discoverFeed(meta.site); if (feed) out.push({name: host(meta.site), url: feed}); }
   return out.map(x => ({...x, cat, fav:fav.name, terms:fav.terms, search:true, official:true}));
 }
 
@@ -236,21 +283,39 @@ async function loadJson(p, fallback){ try { return JSON.parse(await fs.readFile(
 async function remoteJson(u){ if (!SITE) return null; try { return JSON.parse((await get(SITE + u + "?t=" + Date.now(), {tries:1, ms:15000})).text); } catch { return null; } }
 
 const config = await loadJson(path.join(ROOT, "config", "config.json"), {});
-const feeds = (config.feeds && config.feeds.length ? config.feeds : DEFAULT_FEEDS).filter(f => f.on);
+const feeds = (config.feeds && config.feeds.length ? config.feeds : DEFAULT_FEEDS).filter(f => f.on && !/instagram\.com/i.test(f.url));
 const favs = config.favs || {};
+const FOREIGN = !!config.foreign;   // خبرهای انگلیسی (با ترجمه) هم بیاید؟
 const prev = (await remoteJson("/data/news.json")) || {items:[]};
 const prevById = new Map((prev.items || []).map(x => [x.id, x]));
-console.log(`feeds: ${feeds.length}, favourites: ${Object.values(favs).flat().length}, previous items: ${prevById.size}`);
+const prevMeta = (await remoteJson("/data/meta.json")) || {};
+console.log(`feeds: ${feeds.length}, favourites: ${Object.values(favs).flat().length}, foreign: ${FOREIGN}, previous items: ${prevById.size}`);
+
+// اطلاعات هر علاقه‌مندی (اسم فارسی، Steam، سایت، کاور) — تا یک هفته از اجرای قبل استفاده می‌شود
+const favList = [];
+for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.terms && f.terms.length) favList.push([f, cat]);
+const meta = {};
+await pool(favList, 4, async ([f, cat]) => {
+  const k = cat + ":" + f.name, old = prevMeta[k];
+  meta[k] = old && Date.now() - (old.at || 0) < 7*864e5 ? old : {...await favMeta(f, cat), at: Date.now()};
+});
+console.log("persian names:", favList.map(([f, c]) => f.name + "=" + (meta[c + ":" + f.name].fa.join("/") || "-")).join(", "));
 
 const searches = [];
-const favList = [];
-for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.terms && f.terms.length){ searches.push(...searchSources(f, cat)); favList.push([f, cat]); }
-for (const r of await pool(favList, 4, ([f, cat]) => officialSources(f, cat))) if (Array.isArray(r)) searches.push(...r);
-console.log("official sources:", searches.filter(s => s.official).map(s => s.fav + " → " + s.name).join(", ") || "none");
+for (const [f, cat] of favList){
+  const m = meta[cat + ":" + f.name];
+  searches.push(...persianSources(f, cat, m));
+  if (FOREIGN){ searches.push(...searchSources(f, cat)); searches.push(...await officialSources(f, cat, m)); }
+}
 const sources = [...feeds, ...searches];
-const results = await pool(sources, 6, async src => {
+const results = await pool(sources, 5, async src => {
   const tg = !src.search && tgName(src.url);
-  const r = await get(tg ? "https://t.me/s/" + tg : src.url, {tries: src.search ? 3 : 2});
+  let r;
+  for (let t = 0; t < (src.persian ? 4 : 1); t++){   // بینگ گاهی صفحه‌ی خالی می‌دهد
+    r = await get(tg ? "https://t.me/s/" + tg : src.url, {tries: src.search ? 3 : 2});
+    if (!src.persian || /<item>/.test(r.text)) break;
+    await sleep(1500 * (t + 1));
+  }
   let items = tg ? parseTelegram(r.text, src) : parseFeed(r.text, src);
   if (src.official){
     items = items.sort((a, b) => b.ts - a.ts).slice(0, 10);
@@ -258,10 +323,10 @@ const results = await pool(sources, 6, async src => {
     if (app) for (const x of items) if (!x.img) x.img = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/" + app + "/header.jpg";
   }
   else if (src.search){
-    // فقط خبرهایی که اسم علاقه‌مندی در تیترشان هست
     const terms = src.terms.map(norm).filter(t => t.trim());
-    items = items.filter(x => terms.some(t => norm(x.title).includes(t)))
+    items = items.filter(x => (!src.persian || hasFa(x.title)) && terms.some(t => norm(x.title + " " + x.summary).includes(t)))
                  .sort((a, b) => b.ts - a.ts).slice(0, PER_SEARCH);
+    if (src.persian) for (const x of items) x.lang = "fa";
   } else items = items.slice(0, PER_FEED);
   return items;
 });
@@ -272,12 +337,19 @@ results.forEach((r, i) => {
   if (!r || r.error){ console.log("FAILED", s.name, s.fav || "", r && r.error && r.error.message); if (!s.search) failed.push(s.name); return; }
   (s.search ? found : feedItems).push(...r);
 });
-for (const name of new Set(searches.map(s => s.fav)))
-  if (!found.some(x => x.fav === name) && results.every((r, i) => sources[i].fav !== name || !r || r.error)) failed.push("جست‌وجوی " + name);
+console.log("search results:", Object.entries(found.reduce((o, x) => (o[x.fav] = (o[x.fav] || 0) + 1, o), {})).map(e => e.join("=")).join(", "));
 
 feedItems = feedItems.sort((a, b) => b.ts - a.ts).slice(0, MAX_FEED_ITEMS);
 
-// لینک‌های گوگل‌نیوز را به آدرس واقعی تبدیل کن (از اجرای قبل اگر داریم، دوباره نگیر)
+// خبرهای منابع عادی که به یک علاقه‌مندی مربوط‌اند (با اسم انگلیسی یا فارسی)
+const favTerms = favList.map(([f, cat]) => ({cat, name:f.name,
+  terms:[...f.terms, ...meta[cat + ":" + f.name].fa.flatMap(n => [n, toFaDigits(n), toEnDigits(n)])].map(norm).filter(t => t.trim().length >= 3)}));
+for (const x of feedItems){
+  const text = norm(x.title + " " + x.summary);
+  const hit = favTerms.find(f => f.terms.some(t => text.includes(t)));
+  if (hit){ x.fav = hit.name; x.favCat = hit.cat; }
+}
+
 const prevByGLink = new Map((prev.items || []).filter(x => x.glink).map(x => [x.glink, x.link]));
 await pool(found.filter(x => /news\.google\.com/.test(x.link)), 4, async x => {
   x.glink = x.link;
@@ -286,18 +358,12 @@ await pool(found.filter(x => /news\.google\.com/.test(x.link)), 4, async x => {
 });
 found = found.filter(x => !/news\.google\.com/.test(x.link) && !BLOCKED.test(host(x.link)));
 
-// یکی کردن و حذف تکراری‌ها
 let all = [...feedItems, ...found];
 for (const x of all) x.id = hash(x.link);
 const seen = new Set(), seenT = new Set();
 all = all.filter(x => { const t = norm(x.title).trim(); if (seen.has(x.id) || seenT.has(t)) return false; seen.add(x.id); seenT.add(t); return true; })
          .sort((a, b) => b.ts - a.ts);
 
-// پوستر علاقه‌مندی به‌عنوان عکس پشتیبان
-const favImg = {};
-for (const [cat, list] of Object.entries(favs)) for (const f of list) if (f.img) favImg[cat + ":" + f.name] = f.img;
-
-// متن کامل و عکس: از اجرای قبل بردار، فقط خبرهای تازه را بگیر
 await fs.mkdir(path.join(OUT, "a"), {recursive:true});
 const fresh = [];
 for (const x of all){
@@ -314,6 +380,8 @@ for (const x of all){
     if (!x.img){ const im = blocks.find(b => b.t === "img"); if (im) x.img = im.s; }
     x.checked = true; continue;
   }
+  // سایت‌های ایرانی از خارج باز نمی‌شوند؛ عکس و خلاصه‌ی بینگ کافی است
+  if (x.lang === "fa"){ if (x.img && /bing\.com\/th/.test(x.img)) x.img = x.img.replace(/&w=\d+&h=\d+/, "&w=960&h=540"); x.checked = true; continue; }
   const old = prevById.get(x.id);
   if (old && old.checked){ x.img = x.img || old.img; x.full = old.full; x.checked = true; if (!x.summary && old.summary) x.summary = old.summary;
     if (old.full){ const a = await remoteJson("/data/a/" + x.id + ".json"); if (a) await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify(a)); else x.full = false; } }
@@ -326,18 +394,21 @@ await pool(fresh.slice(0, ARTICLE_BUDGET), 8, async x => {
     const a = await fetchArticle(x);
     if (!x.img || /bing\.com\/th/.test(x.img)) x.img = a.og || x.img;
     if (!x.summary && a.desc) x.summary = clip(a.desc, 300);
-    if (a.blocks.length){
-      x.full = true;
-      await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:a.url, blocks:a.blocks}));
-    }
+    if (a.blocks.length){ x.full = true; await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:a.url, blocks:a.blocks})); }
     enriched++;
   } catch {}
   x.checked = true;
 });
+
+// هر خبر باید کاور داشته باشد: عکس خودش، وگرنه کاور علاقه‌مندی‌اش، وگرنه کنار گذاشته می‌شود
 for (const x of all){
-  if (!x.img && x.fav) x.img = favImg[x.cat + ":" + x.fav] || "";
+  if (!x.img && x.fav){ const m = meta[(x.favCat || x.cat) + ":" + x.fav]; const f = (favs[x.favCat || x.cat] || []).find(y => y.name === x.fav);
+    x.img = (m && m.art) || (f && f.img) || ""; if (x.img) x.cover = "fav"; }
   delete x.terms; delete x._html; delete x._tg;
 }
-console.log(`enriched: ${enriched}, with image: ${all.filter(x => x.img).length}/${all.length}, full text: ${all.filter(x => x.full).length}`);
+const noCover = all.filter(x => !x.img).length;
+all = all.filter(x => x.img);
+console.log(`enriched: ${enriched}, dropped without cover: ${noCover}, kept: ${all.length}, full text: ${all.filter(x => x.full).length}`);
 
+await fs.writeFile(path.join(OUT, "meta.json"), JSON.stringify(meta));
 await fs.writeFile(path.join(OUT, "news.json"), JSON.stringify({ts: Date.now(), items: all, failed}));

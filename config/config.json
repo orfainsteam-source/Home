@@ -1,29 +1,64 @@
 {
-  "updated": 1791587776905,
+  "updated": 1791638468928,
   "feeds": [
+    {
+      "name": "ویجیاتو",
+      "url": "https://t.me/s/vigiatonet",
+      "cat": "game",
+      "on": true,
+      "lang": "fa"
+    },
+    {
+      "name": "زومجی",
+      "url": "https://t.me/s/myzoomg",
+      "cat": "game",
+      "on": true,
+      "lang": "fa"
+    },
+    {
+      "name": "گیمفا",
+      "url": "https://t.me/s/gamefa_official",
+      "cat": "game",
+      "on": true,
+      "lang": "fa"
+    },
+    {
+      "name": "آقای انیمه",
+      "url": "https://t.me/s/animestertv",
+      "cat": "anime",
+      "on": true,
+      "lang": "fa"
+    },
+    {
+      "name": "MyAnimes",
+      "url": "https://t.me/s/MyAnimes",
+      "cat": "anime",
+      "on": true,
+      "lang": "fa"
+    },
     {
       "name": "IGN",
       "url": "https://feeds.feedburner.com/ign/news",
       "cat": "game",
-      "on": true
+      "on": false
     },
     {
       "name": "GameSpot",
       "url": "https://www.gamespot.com/feeds/news/",
       "cat": "game",
-      "on": true
+      "on": false
     },
     {
       "name": "PC Gamer",
       "url": "https://www.pcgamer.com/rss/",
       "cat": "game",
-      "on": true
+      "on": false
     },
     {
       "name": "Polygon",
       "url": "https://www.polygon.com/rss/index.xml",
       "cat": "game",
-      "on": true
+      "on": false
     },
     {
       "name": "Eurogamer",
@@ -35,32 +70,25 @@
       "name": "Anime News Network",
       "url": "https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w",
       "cat": "anime",
-      "on": true
+      "on": false
     },
     {
       "name": "MyAnimeList",
       "url": "https://myanimelist.net/rss/news.xml",
       "cat": "anime",
-      "on": true
+      "on": false
     },
     {
       "name": "Anime Corner",
       "url": "https://animecorner.me/feed/",
       "cat": "anime",
-      "on": true
+      "on": false
     },
     {
       "name": "Cartoon Brew",
       "url": "https://www.cartoonbrew.com/feed",
       "cat": "animation",
-      "on": true
-    },
-    {
-      "name": "ویجیاتو",
-      "url": "https://t.me/s/vigiatonet",
-      "cat": "game",
-      "on": true,
-      "lang": "fa"
+      "on": false
     }
   ],
   "favs": {
@@ -226,5 +254,6 @@
         "imdbExact": true
       }
     ]
-  }
+  },
+  "foreign": false
 }

@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#F4F2FF; --surface:#FFFFFF; --ink:#1F1A3D; --muted:#655F8C; --line:#E0DCF3;
-  --glass:rgb(255 255 255 / .84); --game:#0B8C94; --anime:#D2306F; --tech:#6A4FD0; --other:#A86A10; --animation:#D9661A;
+  --glass:rgb(255 255 255 / .84); --game:#0B8C94; --anime:#D2306F; --tech:#6A4FD0; --other:#A86A10; --animation:#D9661A; --studio:#23946A;
   --display:"Lalezar","Vazirmatn",Tahoma,sans-serif;
   --body:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
   box-sizing:border-box;
@@ -21,12 +21,12 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
-    --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A;
+    --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A; --studio:#6BE3A4;
   }
 }
 :root[data-theme="dark"]{
   --bg:#1B1736; --surface:#252049; --glass:rgb(37 32 73 / .8); --ink:#F1EEFF; --muted:#A49ECC; --line:#37305F;
-  --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A;
+  --game:#5CE1E6; --anime:#FF7AB6; --tech:#A894FF; --other:#F2B84B; --animation:#FF9F5A; --studio:#6BE3A4;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -298,12 +298,17 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
     <h4>منابع خبر</h4>
     <div id="feedList"></div>
     <div class="add">
-      <input id="newName" placeholder="اسم منبع (مثلاً Kotaku)">
+      <select id="newType" class="full" aria-label="نوع منبع">
+        <option value="tg">کانال تلگرام</option>
+        <option value="ig">پیج اینستاگرام</option>
+        <option value="rss">سایت (RSS)</option>
+      </select>
+      <input id="newName" placeholder="اسم منبع (مثلاً زومجی)">
       <select id="newCat"></select>
-      <input id="newUrl" class="full ltr" placeholder="https://example.com/rss" inputmode="url">
+      <input id="newUrl" class="full ltr" placeholder="@myzoomg" inputmode="url">
       <button class="btn ghost full" id="addFeed" type="button">افزودن منبع</button>
     </div>
-    <p class="hint">هر سایتی که فید RSS دارد را می‌شود اضافه کرد. کانال عمومی تلگرام هم قبول است (مثلاً <span dir="ltr">@vigiatonet</span>)؛ سایت‌های ایرانی را از این راه اضافه کن، چون از سرورهای خارج از ایران باز نمی‌شوند.</p>
+    <p class="hint">کانال عمومی تلگرام (مثلاً <span dir="ltr">@myzoomg</span>)، پیج اینستاگرام (مثلاً <span dir="ltr">@gamefa.official</span>) یا فید RSS یک سایت. سایت‌های ایرانی را از راه تلگرام یا اینستاگرامشان اضافه کن؛ خودشان از خارج ایران باز نمی‌شوند.</p>
 
     <h4 id="favHead">علاقه‌مندی‌ها</h4>
     <p class="hint">اسم را تایپ کن و از پیشنهادها مورد درست را انتخاب کن. اسم رسمی و اسم‌های دیگرش خودکار ثبت می‌شوند. پیشنهاد بازی‌ها از Wikidata و انیمه‌ها از AniList می‌آید. اگر چیزی پیدا نشد، می‌توانی همان متن را دستی اضافه کنی. اسم‌های دیگر را با کاما جدا کن، مثلاً <span class="ltr" dir="ltr">GTA 6, GTA VI</span>. برای هر کدام، آخرین خبرهای یک ماه اخیر از کل اینترنت (Google News و Bing News) جمع می‌شود. بخشی که خالی بماند، همه‌ی خبرهای منابعش نشان داده می‌شود.</p>
@@ -316,6 +321,16 @@ dialog::backdrop{background:rgb(10 8 30 / .55)}
       <input id="ghToken" class="ltr" type="password" autocomplete="off" placeholder="github_pat_...">
       <div class="gh-state" id="ghState"></div>
     </div>
+
+    <h4>اینستاگرام</h4>
+    <p class="hint" id="igHint">پیج‌های اینستاگرام (سایت‌های خبری یا هر شخصی) را از بخش منابع اضافه کن؛ نوع منبع را «اینستاگرام» بگذار. پست‌هایشان فقط داخل اپ اندروید خوانده می‌شود، چون اینستاگرام ورود به حساب می‌خواهد.</p>
+    <div id="igBox" hidden>
+      <div class="gh-state" id="igState"></div>
+      <button class="btn ghost" id="igLogin" type="button" style="margin-top:8px">ورود به اینستاگرام</button>
+    </div>
+
+    <h4>خبرهای خارجی</h4>
+    <label class="radio"><input type="checkbox" id="foreign"> برای علاقه‌مندی‌ها در سایت‌های خارجی و Steam هم بگرد (انگلیسی؛ ترجمه می‌شود)</label>
 
     <h4>ترجمه</h4>
     <div class="radio">
@@ -380,23 +395,28 @@ const CATS = {
   anime: {label:"انیمه",    color:"var(--anime)"},
   tech:  {label:"تکنولوژی", color:"var(--tech)"},
   animation: {label:"انیمیشن", color:"var(--animation)"},
+  studio: {label:"استودیو", color:"var(--studio)"},
   other: {label:"سایر",     color:"var(--other)"}
 };
 
 const DEFAULT_FEEDS = [
-  {name:"IGN",               url:"https://feeds.feedburner.com/ign/news",                      cat:"game",  on:true},
-  {name:"GameSpot",          url:"https://www.gamespot.com/feeds/news/",                       cat:"game",  on:true},
-  {name:"PC Gamer",          url:"https://www.pcgamer.com/rss/",                               cat:"game",  on:true},
-  {name:"Polygon",           url:"https://www.polygon.com/rss/index.xml",                      cat:"game",  on:true},
-  {name:"Eurogamer",         url:"https://www.eurogamer.net/feed",                             cat:"game",  on:false},
-  {name:"Anime News Network",url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:true},
-  {name:"MyAnimeList",       url:"https://myanimelist.net/rss/news.xml",                       cat:"anime", on:true},
-  {name:"Anime Corner",      url:"https://animecorner.me/feed/",                               cat:"anime", on:true},
-  {name:"Cartoon Brew",      url:"https://www.cartoonbrew.com/feed",                           cat:"animation", on:true},
-  {name:"ویجیاتو",           url:"https://t.me/s/vigiatonet",                                  cat:"game",  on:true, lang:"fa"}
+  {name:"ویجیاتو",    url:"https://t.me/s/vigiatonet",      cat:"game",  on:true, lang:"fa"},
+  {name:"زومجی",      url:"https://t.me/s/myzoomg",         cat:"game",  on:true, lang:"fa"},
+  {name:"گیمفا",      url:"https://t.me/s/gamefa_official", cat:"game",  on:true, lang:"fa"},
+  {name:"آقای انیمه", url:"https://t.me/s/animestertv",     cat:"anime", on:true, lang:"fa"},
+  {name:"MyAnimes",   url:"https://t.me/s/MyAnimes",        cat:"anime", on:true, lang:"fa"},
+  {name:"IGN",                url:"https://feeds.feedburner.com/ign/news",                      cat:"game",  on:false},
+  {name:"GameSpot",           url:"https://www.gamespot.com/feeds/news/",                       cat:"game",  on:false},
+  {name:"PC Gamer",           url:"https://www.pcgamer.com/rss/",                               cat:"game",  on:false},
+  {name:"Polygon",            url:"https://www.polygon.com/rss/index.xml",                      cat:"game",  on:false},
+  {name:"Eurogamer",          url:"https://www.eurogamer.net/feed",                             cat:"game",  on:false},
+  {name:"Anime News Network", url:"https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w", cat:"anime", on:false},
+  {name:"MyAnimeList",        url:"https://myanimelist.net/rss/news.xml",                       cat:"anime", on:false},
+  {name:"Anime Corner",       url:"https://animecorner.me/feed/",                               cat:"anime", on:false},
+  {name:"Cartoon Brew",       url:"https://www.cartoonbrew.com/feed",                           cat:"animation", on:false}
 ];
 
-const DEFAULTS = {feeds:DEFAULT_FEEDS, engine:"google", geminiKey:"", geminiModel:"gemini-3.5-flash", theme:"auto", favs:{}, favOnly:true};
+const DEFAULTS = {foreign:false, feeds:DEFAULT_FEEDS, engine:"google", geminiKey:"", geminiModel:"gemini-3.5-flash", theme:"auto", favs:{}, favOnly:true};
 
 // کلمه‌ای که کنار اسم علاقه‌مندی در جست‌وجو می‌آید تا نتیجه‌های بی‌ربط (مثلاً One Piece در معنای دیگر) کم شود
 const CAT_WORDS = {game:["game","gaming"], anime:["anime","manga"], animation:["animated","series","season"], tech:["tech"], other:[]};
@@ -466,6 +486,7 @@ async function suggestWikidata(q, cat){
   const d = JSON.parse(await fetchText("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&type=item&limit=15&language=en&uselang=en&search=" + encodeURIComponent(q), {}, 10000));
   let list = d.search || [];
   if (cat === "game"){ const g = list.filter(x => GAME_RE.test(x.description || "")); if (g.length) list = g; }
+  if (cat === "studio"){ const g = list.filter(x => STUDIO_RE.test(x.description || "")); if (g.length) list = g; }
   return list.slice(0, 8).map(x => ({name: x.label || x.id, sub: x.description || "", img:"",
     pick: () => pickWikidata(x.id, x.label, q)}));
 }
@@ -496,8 +517,9 @@ async function suggestTV(q){
       imdbExact: !!(x.externals && x.externals.imdb)})}));
 }
 const suggestFor = (cat, q) => cat === "anime" ? suggestAnime(q) : cat === "animation" ? suggestTV(q) : suggestWikidata(q, cat);
+const STUDIO_RE = /developer|publisher|studio|video game company|game company/i;
 
-const FAV_HINT = {game:"Dota 2, Elden Ring…", anime:"One Piece, Frieren…", animation:"Rick and Morty, Arcane…", tech:"Steam Deck…", other:"Keyword…"};
+const FAV_HINT = {studio:"FromSoftware, Rockstar Games…", game:"Dota 2, Elden Ring…", anime:"One Piece, Frieren…", animation:"Rick and Morty, Arcane…", tech:"Steam Deck…", other:"Keyword…"};
 
 /* ---------- storage ---------- */
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -507,12 +529,18 @@ let settings = Object.assign({}, DEFAULTS, load("hn:settings", {}));
 // مدل‌های جمینای ۱.x و ۲.x خاموش شده‌اند؛ تنظیم قدیمی ذخیره‌شده را به مدل جدید ببر
 if (/^gemini-[12]\./.test(settings.geminiModel || "")) { settings.geminiModel = DEFAULTS.geminiModel; save("hn:settings", settings); }
 // منبع‌های پیش‌فرضی که بعداً اضافه شده‌اند به فهرست قبلی کاربر هم اضافه شوند
-const DEFAULTS_VERSION = 3, ADDED_IN = {"https://www.cartoonbrew.com/feed":2, "https://t.me/s/vigiatonet":3};
+const DEFAULTS_VERSION = 4, ADDED_IN = {"https://www.cartoonbrew.com/feed":2, "https://t.me/s/vigiatonet":3,
+  "https://t.me/s/myzoomg":4, "https://t.me/s/gamefa_official":4, "https://t.me/s/animestertv":4, "https://t.me/s/MyAnimes":4};
 let migratedFeeds = false;
 if ((settings.defaultsVersion || 1) < DEFAULTS_VERSION){
   for (const f of DEFAULT_FEEDS){
     const v = ADDED_IN[f.url];
     if (v && v > (settings.defaultsVersion || 1) && !settings.feeds.some(x => x.url === f.url)){ settings.feeds.push({...f}); migratedFeeds = true; }
+  }
+  // نسخه‌ی ۴: منبع‌های خارجی (که ترجمه لازم دارند) خاموش می‌شوند؛ از تنظیمات دوباره روشن می‌شوند
+  if ((settings.defaultsVersion || 1) < 4){
+    for (const f of settings.feeds) if (!f.lang && !/^https?:\/\/(t|telegram)\.me\//i.test(f.url) && !/instagram\.com/i.test(f.url) && f.on){ f.on = false; migratedFeeds = true; }
+    settings.feeds.sort((a, b) => (b.lang === "fa") - (a.lang === "fa"));
   }
   settings.defaultsVersion = DEFAULTS_VERSION;
   if (migratedFeeds) settings.cfgUpdated = Date.now();
@@ -533,8 +561,9 @@ const favMode = () => settings.favOnly && hasFavs();
 const perFeed = () => hasFavs() ? 40 : 12;
 const maxItems = () => hasFavs() ? 240 : 90;
 let favMemo = new Map();
+const favCatOf = item => item.favCat || item.cat;
 function favOf(item){
-  if (item.fav) return favsOf(item.cat).some(f => f.name === item.fav) ? item.fav : "";
+  if (item.fav) return favsOf(favCatOf(item)).some(f => f.name === item.fav) ? item.fav : "";
   if (favMemo.has(item.id)) return favMemo.get(item.id);
   const text = norm(item.title + " " + item.summary);
   let hit = "";
@@ -547,8 +576,8 @@ function favOf(item){
 // آیا این خبر با حالت فعلی علاقه‌مندی‌ها نشان داده می‌شود؟ (بدون در نظر گرفتن تب و جست‌وجو)
 function wanted(item){
   if (!favMode()) return !item.search;   // نتیجه‌های جست‌وجو فقط در حالت علاقه‌مندی‌ها
-  if (favPick) return favPick === item.cat + ":" + favOf(item);
-  if (!favsOf(item.cat).length) return true;
+  if (favPick) return favPick === favCatOf(item) + ":" + favOf(item);
+  if (!favsOf(favCatOf(item)).length && !item.fav) return true;
   const hit = favOf(item);
   return !!hit;
 }
@@ -699,7 +728,7 @@ async function ghApi(path, opts = {}){
 }
 function b64(str){ const b = new TextEncoder().encode(str); let s = ""; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
 async function pushConfig(){
-  const body = JSON.stringify({updated: settings.cfgUpdated || Date.now(), feeds: settings.feeds, favs: settings.favs || {}}, null, 2) + "\n";
+  const body = JSON.stringify({updated: settings.cfgUpdated || Date.now(), foreign: !!settings.foreign, feeds: settings.feeds, favs: settings.favs || {}}, null, 2) + "\n";
   let sha;
   try { sha = (await ghApi("/contents/config/config.json?ref=main")).sha; } catch(e){ if (e.status !== 404) throw e; }
   await ghApi("/contents/config/config.json", {method:"PUT", body: JSON.stringify({message:"Update favourites", content:b64(body), sha, branch:"main"})});
@@ -720,6 +749,7 @@ async function loadRemoteConfig(){
     if ((c.updated || 0) > (settings.cfgUpdated || 0)){
       if (c.favs) settings.favs = c.favs;
       if (c.feeds && c.feeds.length) settings.feeds = c.feeds;
+      if ("foreign" in c) settings.foreign = !!c.foreign;
       settings.cfgUpdated = c.updated; favMemo = new Map(); save("hn:settings", settings);
       return true;
     }
@@ -743,6 +773,7 @@ function watchForUpdate(sinceTs, note){
 }
 function applyData(d){
   cache = {ts:d.ts, items:d.items, failed:d.failed || [], fetched:Date.now(), remote:true};
+  mergeIg();
   favMemo = new Map(); save("hn:items", cache);
   renderTabs(); render(); translateAll();
 }
@@ -756,6 +787,7 @@ async function refresh(manual){
   busy = false; $("refreshBtn").classList.remove("busy");
   if (!d) return refreshDirect();
   applyData(d);
+  refreshInstagram(manual);
   // با دکمه‌ی به‌روزرسانی، اگر داده‌ها کهنه‌اند و توکن داریم، یک جمع‌آوری تازه درخواست کن
   if (manual && settings.ghToken && Date.now() - d.ts > 8*60*1000){
     try { await requestCollect(); watchForUpdate(d.ts, "جمع‌آوری تازه شروع شد. چند دقیقه‌ی دیگر خبرها خودکار عوض می‌شوند."); } catch {}
@@ -886,6 +918,7 @@ const cards = new Map();
 
 function renderTabs(){
   const used = new Set(settings.feeds.filter(f => f.on).map(f => f.cat));
+  for (const x of cache.items) used.add(x.cat);
   const list = [["all","همه",""], ...Object.entries(CATS).filter(([k]) => used.has(k)).map(([k, v]) => [k, v.label, v.color])];
   if (!list.some(([k]) => k === tab)) tab = "all";
   document.body.dataset.tab = (tab === "game" || tab === "anime") ? tab : "all";
@@ -925,7 +958,7 @@ function makeCard(item, lead){
   const body = el("div", "body");
   const meta = el("div", "meta");
   meta.append(el("span", "src", item.src), el("span", "", ago(item.ts)));
-  const fv = favsOf(item.cat).length ? favOf(item) : "";
+  const fv = favOf(item);
   if (fv) meta.append(el("span", "fav", "★ " + fv));
   const h = el("h2"), p = el("p");
   h.onclick = () => openReader(item);
@@ -964,7 +997,7 @@ function renderFavUI(){
   bar.hidden = list.length < 2;
   if (bar.hidden){ paintFavInfo(); return; }
   const count = {};
-  for (const x of cache.items){ const h = favsOf(x.cat).length && favOf(x); if (h) count[x.cat + ":" + h] = (count[x.cat + ":" + h] || 0) + 1; }
+  for (const x of cache.items){ const h = favOf(x); if (h){ const k = favCatOf(x) + ":" + h; count[k] = (count[k] || 0) + 1; } }
   const chip = (key, label, n, color) => {
     const b = el("button", "chip" + (n === 0 ? " zero" : "")); b.type = "button";
     b.setAttribute("aria-pressed", String(favPick === key));
@@ -1081,7 +1114,7 @@ function render(){
   renderFavUI();
   const feed = $("feed"); feed.textContent = ""; cards.clear();
   const q = query.toLowerCase();
-  const list = cache.items.filter(x => (tab === "all" || x.cat === tab) && wanted(x) &&
+  const list = cache.items.filter(x => x.img && (tab === "all" || x.cat === tab || (tab !== "all" && x.favCat === tab)) && wanted(x) &&
     (!q || x.title.toLowerCase().includes(q) || (tr[x.id] && tr[x.id].t.toLowerCase().includes(q))));
   if (!list.length){
     const box = el("div", "empty");
@@ -1119,11 +1152,68 @@ function setStatus(msg, trFails = 0){
   if (cache.ts) parts.push(["", "آخرین جمع‌آوری " + ago(cache.ts)]);
   if (translating) parts.push(["", "در حال ترجمه…"]);
   if (cache.failed && cache.failed.length) parts.push(["warn", "این منبع‌ها جواب ندادند: " + cache.failed.join("، ")]);
+  if (NATIVE && cache.igFailed && cache.igFailed.length)
+    parts.push(["warn", "این پیج‌های اینستاگرام خوانده نشدند: " + cache.igFailed.join("، ") + (NATIVE.igLoggedIn() ? "" : " (در تنظیمات وارد اینستاگرام شو)")]);
   if (cache.remote && hasFavs() && !favsSynced())
     parts.push(["warn", settings.ghToken ? "علاقه‌مندی‌ها هنوز به جمع‌کننده نرسیده‌اند؛ چند دقیقه صبر کن"
                                          : "علاقه‌مندی‌ها هنوز در GitHub ذخیره نشده‌اند، برای همین خبری برایشان جمع نمی‌شود. توکن را در تنظیمات وارد کن"]);
   if (trFails) parts.push(["warn", "ترجمه‌ی " + trFails.toLocaleString("fa-IR") + " خبر انجام نشد"]);
   parts.forEach(([c, t], i) => { if (i) s.append("، "); s.append(el("span", c, t)); });
+}
+
+/* ---------- Instagram (only inside the Android app) ---------- */
+const NATIVE = window.HomeNative || null;
+const nativeWait = {}; let nativeSeq = 0;
+window.__nativeDone = (id, status, body) => { const w = nativeWait[id]; if (w){ delete nativeWait[id]; w({status, body}); } };
+const nativeGet = url => new Promise((res, rej) => {
+  const id = "n" + (++nativeSeq); nativeWait[id] = res;
+  setTimeout(() => { if (nativeWait[id]){ delete nativeWait[id]; rej(new Error("timeout")); } }, 30000);
+  NATIVE.request(id, url);
+});
+const igFeeds = () => settings.feeds.filter(f => f.on && /instagram\.com/i.test(f.url));
+const igUser = f => (f.url.match(/instagram\.com\/([A-Za-z0-9_.]+)/i) || [])[1];
+let igCache = load("hn:ig", {ts:0, items:[], failed:[]});
+function igToItems(json, feed){
+  const edges = (((json.data || {}).user || {}).edge_owner_to_timeline_media || {}).edges || [];
+  return edges.map(e => e.node).filter(n => n && n.display_url).map(n => {
+    const cap = ((((n.edge_media_to_caption || {}).edges || [])[0] || {}).node || {}).text || "";
+    const lines = cap.split("\n").map(l => l.replace(/^[\s\p{Extended_Pictographic}\u200d\ufe0f•▪️◾️🔸🔹➖⏺]+/u, "").trim())
+      .filter(l => l && !/^[#@]/.test(l));
+    const title = (lines[0] || "پست جدید " + feed.name).slice(0, 200);
+    return {id:"ig_" + n.shortcode, title, summary: lines.slice(1).join(" ").slice(0, 300), img: n.display_url,
+            link:"https://www.instagram.com/p/" + n.shortcode + "/", ts:(n.taken_at_timestamp || 0) * 1000,
+            src: feed.name, cat: feed.cat, ig:true, full: lines.length > 1, blocks: lines.slice(1).map(x => ({t:"p", x}))};
+  });
+}
+async function refreshInstagram(force){
+  if (!NATIVE || !igFeeds().length) return;
+  if (!force && Date.now() - igCache.ts < 20*60*1000){ mergeIg(); return; }
+  const items = [], failed = [];
+  for (const f of igFeeds()){
+    try {
+      const r = await nativeGet("https://www.instagram.com/api/v1/users/web_profile_info/?username=" + encodeURIComponent(igUser(f)));
+      if (r.status !== 200) throw new Error("HTTP " + r.status);
+      items.push(...igToItems(JSON.parse(r.body), f).slice(0, 12));
+    } catch { failed.push(f.name); }
+    await new Promise(r => setTimeout(r, 1200));   // پشت‌سرهم درخواست ندهیم
+  }
+  igCache = {ts: Date.now(), items, failed};
+  save("hn:ig", igCache);
+  mergeIg(); render(); translateAll();
+}
+function mergeIg(){
+  const keep = cache.items.filter(x => !x.ig);
+  const ids = new Set(keep.map(x => x.id));
+  cache.items = [...keep, ...igCache.items.filter(x => !ids.has(x.id) && igFeeds().some(f => f.name === x.src))].sort((a, b) => b.ts - a.ts);
+  cache.igFailed = igCache.failed;
+}
+function paintIg(){
+  $("igBox").hidden = !NATIVE;
+  if (!NATIVE) return;
+  const ok = NATIVE.igLoggedIn();
+  $("igState").className = "gh-state " + (ok ? "ok" : "bad");
+  $("igState").textContent = ok ? "به اینستاگرام وصل هستی." : "هنوز وارد اینستاگرام نشده‌ای؛ بدون ورود، پست‌ها خوانده نمی‌شوند.";
+  $("igLogin").textContent = ok ? "ورود دوباره" : "ورود به اینستاگرام";
 }
 
 /* ---------- reader ---------- */
@@ -1171,8 +1261,8 @@ async function openReader(item){
   dlg.scrollTop = 0;
   if (!t) translateAll();
 
-  let blocks = null;
-  if (item.full && cache.remote){
+  let blocks = item.blocks && item.blocks.length ? item.blocks : null;
+  if (!blocks && item.full && cache.remote){
     body.append(el("p", "pending", "در حال آوردن متن کامل…"));
     try { blocks = JSON.parse(await fetchText("data/a/" + item.id + ".json", {}, 15000)).blocks; } catch {}
     if (my !== readerSeq) return;
@@ -1224,6 +1314,7 @@ async function openReader(item){
   await Promise.all([worker(), worker(), worker()]);
   if (my === readerSeq && artTr[item.id]) saveArtTr(item.id);
 }
+$("igLogin").onclick = () => { if (NATIVE) NATIVE.openInstagramLogin(); };
 $("rClose").onclick = () => $("reader").close();
 $("reader").addEventListener("close", () => { readerSeq++; });
 $("rOrig").onclick = () => {
@@ -1240,6 +1331,7 @@ function openSettings(){
   for (const [k, v] of Object.entries(CATS)){ const o = el("option", "", v.label); o.value = k; sel.append(o); }
   paintFeedList(); paintFavEdit();
   document.querySelectorAll('input[name="engine"]').forEach(r => r.checked = r.value === draft.engine);
+  $("foreign").checked = !!draft.foreign; paintIg();
   $("ghToken").value = draft.ghToken || ""; $("ghState").textContent = ""; $("ghState").className = "gh-state";
   $("gKey").value = draft.geminiKey; $("gModel").value = draft.geminiModel; $("theme").value = draft.theme;
   $("settings").showModal();
@@ -1264,7 +1356,7 @@ function paintFavEdit(focusCat){
   if (!draft.favs) draft.favs = {};
   const used = new Set(draft.feeds.map(f => f.cat));
   for (const [cat, info] of Object.entries(CATS)){
-    if (!used.has(cat) && !(draft.favs[cat] || []).length) continue;
+    if (!used.has(cat) && !["game","anime","animation","studio"].includes(cat) && !(draft.favs[cat] || []).length) continue;
     const list = draft.favs[cat] || (draft.favs[cat] = []);
     const wrap = el("div", "fav-cat"); wrap.style.setProperty("--c", info.color);
     wrap.append(el("strong", "", info.label));
@@ -1368,11 +1460,16 @@ function paintFavEdit(focusCat){
     if (focusCat === cat) setTimeout(() => inp.focus(), 0);
   }
 }
+$("newType").onchange = () => { $("newUrl").placeholder = {tg:"@myzoomg", ig:"@gamefa.official", rss:"https://example.com/rss"}[$("newType").value]; };
 $("addFeed").onclick = () => {
   const name = $("newName").value.trim(); let url = $("newUrl").value.trim();
   // کانال تلگرام: @name یا t.me/name
+  const type = $("newType").value;
+  const handle = (url.match(/^@?([A-Za-z0-9_.]{2,})\/?$/) || [])[1];
   const tg = url.match(/^(?:@|(?:https?:\/\/)?(?:t|telegram)\.me\/(?:s\/)?)([A-Za-z0-9_]{4,})\/?$/i);
-  if (tg) url = "https://t.me/s/" + tg[1];
+  const ig = url.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([A-Za-z0-9_.]+)\/?/i);
+  if (ig || (type === "ig" && handle)) url = "https://www.instagram.com/" + (ig ? ig[1] : handle) + "/";
+  else if (tg || (type === "tg" && handle)) url = "https://t.me/s/" + (tg ? tg[1] : handle);
   if (!name || !safeUrl(url)){ $("newUrl").focus(); return; }
   draft.feeds.push({name, url, cat:$("newCat").value, on:true});
   $("newName").value = ""; $("newUrl").value = ""; paintFeedList();
@@ -1383,6 +1480,8 @@ $("saveSettings").onclick = () => {
   draft.geminiKey = $("gKey").value.trim(); draft.geminiModel = $("gModel").value.trim() || DEFAULTS.geminiModel;
   draft.theme = $("theme").value;
   draft.ghToken = $("ghToken").value.trim();
+  const foreignChanged = !!draft.foreign !== $("foreign").checked;
+  draft.foreign = $("foreign").checked;
   for (const k of Object.keys(draft.favs)) if (!draft.favs[k].length) delete draft.favs[k];
   const feedsChanged = JSON.stringify(draft.feeds) !== JSON.stringify(settings.feeds);
   const favsChanged = JSON.stringify(draft.favs) !== JSON.stringify(settings.favs || {});
@@ -1393,7 +1492,7 @@ $("saveSettings").onclick = () => {
   if (favsChanged){ favMemo = new Map(); favPick = ""; }
   applyTheme(); renderTabs(); $("settings").close();
   // توکن تازه وارد شده: علاقه‌مندی‌های فعلی این مرورگر را هم یک بار به مخزن بفرست
-  const cfgChanged = feedsChanged || favsChanged || (settings.ghToken && settings.ghToken !== tokenBefore && hasFavs());
+  const cfgChanged = feedsChanged || favsChanged || foreignChanged || (settings.ghToken && settings.ghToken !== tokenBefore && hasFavs());
   if (cfgChanged) settings.cfgUpdated = Date.now(), save("hn:settings", settings);
   render(); translateAll();
   if (cfgChanged && settings.ghToken){
@@ -1440,8 +1539,10 @@ $("search").oninput = e => { query = e.target.value.trim(); render(); };
 /* ---------- start ---------- */
 applyTheme(); paintHeader(); renderTabs(); render();
 loadRemoteConfig().then(changed => {
-  if (migratedFeeds && settings.ghToken) pushConfig().catch(() => {}); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
+  if (migratedFeeds && settings.ghToken) pushConfig().catch(() => {});
+  if (NATIVE) refreshInstagram(false); if (changed){ renderTabs(); render(); } if (changed || isStale()) refresh(); else translateAll(); });
 setInterval(() => { paintHeader(); if (!document.hidden && isStale()) refresh(); }, 60*1000);
+window.__homeResumed = () => { paintHeader(); if (NATIVE && $("settings").open) paintIg(); };
 document.addEventListener("visibilitychange", () => { if (!document.hidden && isStale()) refresh(); });
 })();
 </script>

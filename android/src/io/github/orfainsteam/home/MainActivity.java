@@ -10,6 +10,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
+import org.json.JSONObject;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -24,7 +30,59 @@ import android.webkit.WebViewClient;
 public class MainActivity extends Activity {
     static final String HOME = "https://orfainsteam-source.github.io/Home/";
     static final String HOST = "orfainsteam-source.github.io";
+    static final String IG_LOGIN = "https://www.instagram.com/accounts/login/";
     private WebView web;
+    private boolean igMode = false;   // در حال ورود به اینستاگرام داخل اپ
+    private boolean clearPending = false;
+
+    /** پل بین صفحه و اپ: فقط برای خواندن پست‌های اینستاگرام با حساب واردشده‌ی کاربر */
+    class Bridge {
+        @JavascriptInterface public String version() { return "2"; }
+
+        @JavascriptInterface public boolean igLoggedIn() {
+            String c = CookieManager.getInstance().getCookie("https://www.instagram.com/");
+            return c != null && c.contains("sessionid=");
+        }
+
+        @JavascriptInterface public void openInstagramLogin() {
+            runOnUiThread(new Runnable() { public void run() { igMode = true; web.loadUrl(IG_LOGIN); } });
+        }
+
+        @JavascriptInterface public void request(final String id, final String url) {
+            new Thread(new Runnable() { public void run() {
+                int code = 0; String body = "";
+                try {
+                    URL u = new URL(url);
+                    if (!"https".equals(u.getProtocol()) || !u.getHost().endsWith("instagram.com")) throw new SecurityException("host");
+                    HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                    c.setConnectTimeout(15000); c.setReadTimeout(20000);
+                    String cookies = CookieManager.getInstance().getCookie("https://www.instagram.com/");
+                    if (cookies != null){
+                        c.setRequestProperty("Cookie", cookies);
+                        for (String part : cookies.split(";")) {
+                            String p = part.trim();
+                            if (p.startsWith("csrftoken=")) c.setRequestProperty("X-CSRFToken", p.substring(10));
+                        }
+                    }
+                    c.setRequestProperty("User-Agent", web.getSettings().getUserAgentString());
+                    c.setRequestProperty("X-IG-App-ID", "936619743392459");
+                    c.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+                    c.setRequestProperty("Accept", "application/json");
+                    c.setRequestProperty("Referer", "https://www.instagram.com/");
+                    code = c.getResponseCode();
+                    InputStream in = code >= 400 ? c.getErrorStream() : c.getInputStream();
+                    if (in != null) {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        byte[] buf = new byte[16384]; int n;
+                        while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                        body = out.toString("UTF-8");
+                    }
+                } catch (Exception e) { body = String.valueOf(e.getMessage()); }
+                final String js = "window.__nativeDone && window.__nativeDone(" + JSONObject.quote(id) + "," + code + "," + JSONObject.quote(body) + ")";
+                runOnUiThread(new Runnable() { public void run() { web.evaluateJavascript(js, null); } });
+            }}).start();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle state) {
@@ -41,14 +99,37 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(true);
         s.setCacheMode(isOnline() ? WebSettings.LOAD_DEFAULT : WebSettings.LOAD_CACHE_ELSE_NETWORK);
         CookieManager.getInstance().setAcceptCookie(true);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
+        web.addJavascriptInterface(new Bridge(), "HomeNative");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 Uri u = req.getUrl();
                 if (HOST.equalsIgnoreCase(u.getHost())) return false;   // خود صفحه، داخل اپ بماند
+                String h = u.getHost() == null ? "" : u.getHost();
+                // حین ورود به اینستاگرام، صفحه‌های اینستاگرام/فیسبوک داخل اپ باز شوند
+                if (igMode && (h.endsWith("instagram.com") || h.endsWith("facebook.com"))) {
+                    // بعد از ورود، اینستاگرام به صفحه‌ی اصلی‌اش می‌رود؛ همان‌جا برگرد به خانه
+                    String path = u.getPath() == null ? "/" : u.getPath();
+                    if (h.endsWith("instagram.com") && ("/".equals(path) || path.startsWith("/accounts/onetap"))
+                        && CookieManager.getInstance().getCookie("https://www.instagram.com/") != null
+                        && CookieManager.getInstance().getCookie("https://www.instagram.com/").contains("sessionid=")) {
+                        goHome(); return true;
+                    }
+                    return false;
+                }
                 openOutside(u);                                          // سایت خبر، IMDb و … در مرورگر
                 return true;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (clearPending && url != null && url.startsWith(HOME)) { clearPending = false; view.clearHistory(); }
+                if (igMode && url != null && url.startsWith("https://www.instagram.com/") && !url.contains("/accounts/")) {
+                    String ck = CookieManager.getInstance().getCookie("https://www.instagram.com/");
+                    if (ck != null && ck.contains("sessionid=")) goHome();
+                }
             }
 
             @Override
@@ -73,6 +154,13 @@ public class MainActivity extends Activity {
         else web.loadUrl(HOME);
     }
 
+    private void goHome() {
+        igMode = false;
+        CookieManager.getInstance().flush();
+        clearPending = true;
+        web.loadUrl(HOME);
+    }
+
     private void openOutside(Uri u) {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, u));
@@ -87,6 +175,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (igMode) { goHome(); return; }
         // اول پنجره‌ی باز (خواندن خبر یا تنظیمات) بسته شود، بعد صفحه‌ی قبل، بعد خروج
         web.evaluateJavascript(
             "(function(){var d=[].slice.call(document.querySelectorAll('dialog[open]')).pop();if(d){d.close();return 1}return 0})()",
@@ -109,5 +198,8 @@ public class MainActivity extends Activity {
     protected void onPause() { super.onPause(); web.onPause(); CookieManager.getInstance().flush(); }
 
     @Override
-    protected void onResume() { super.onResume(); web.onResume(); }
+    protected void onResume() {
+        super.onResume(); web.onResume();
+        web.evaluateJavascript("window.__homeResumed && window.__homeResumed()", null);
+    }
 }
