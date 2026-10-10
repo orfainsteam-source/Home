@@ -1,5 +1,5 @@
 {
-  "updated": 1791660099348,
+  "updated": 1791660240544,
   "foreign": true,
   "feeds": [
     {
@@ -94,12 +94,6 @@
     {
       "name": "viliden",
       "url": "https://t.me/s/VilideNTV",
-      "cat": "game",
-      "on": true
-    },
-    {
-      "name": "jp",
-      "url": "https://www.instagram.com/fromsoftware_jp/",
       "cat": "game",
       "on": true
     }
