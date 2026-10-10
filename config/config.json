@@ -1,5 +1,5 @@
 {
-  "updated": 1791640994122,
+  "updated": 1791642617408,
   "foreign": false,
   "feeds": [
     {
@@ -282,6 +282,73 @@
         "imdb": "",
         "imdbExact": false,
         "bg": ""
+      },
+      {
+        "name": "Rockstar Toronto",
+        "terms": [
+          "Rockstar Toronto",
+          "Imagexcel",
+          "Rockstar Canada",
+          "Alternative Reality Technologies",
+          "rockstar"
+        ],
+        "src": "wikidata",
+        "id": "Q1989672",
+        "page": "https://www.wikidata.org/wiki/Q1989672",
+        "imdb": "",
+        "imdbExact": false
+      },
+      {
+        "name": "Rockstar Lincoln",
+        "terms": [
+          "Rockstar Lincoln",
+          "Tarantula Studios",
+          "Spidersoft",
+          "rockstar"
+        ],
+        "src": "wikidata",
+        "id": "Q1831780",
+        "page": "https://www.wikidata.org/wiki/Q1831780",
+        "imdb": "",
+        "imdbExact": false
+      },
+      {
+        "name": "Rockstar Vancouver",
+        "terms": [
+          "Rockstar Vancouver",
+          "Barking Dog Studios",
+          "rockstar"
+        ],
+        "src": "wikidata",
+        "id": "Q2020713",
+        "page": "https://www.wikidata.org/wiki/Q2020713",
+        "imdb": "",
+        "imdbExact": false
+      },
+      {
+        "name": "Rockstar London",
+        "terms": [
+          "Rockstar London",
+          "rockstar"
+        ],
+        "src": "wikidata",
+        "id": "Q2083043",
+        "page": "https://www.wikidata.org/wiki/Q2083043",
+        "imdb": "",
+        "imdbExact": false
+      },
+      {
+        "name": "Electronic Arts",
+        "terms": [
+          "Electronic Arts",
+          "EA Games",
+          "Electronic Arts Inc."
+        ],
+        "src": "wikidata",
+        "id": "Q173941",
+        "page": "https://www.wikidata.org/wiki/Q173941",
+        "imdb": "",
+        "imdbExact": false
       }
     ]
   }
