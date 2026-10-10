@@ -79,7 +79,7 @@ function parseFeed(body, feed){
     const html = text(n["content:encoded"]) || text(n.description) || text(n.summary) || text(n.content);
     const encl = arr(n.enclosure).find(e => /image/i.test(e["@type"] || "") || /\.(jpe?g|png|webp|gif)/i.test(e["@url"] || ""));
     let img = text(n["News:Image"]);
-    if (img) img = img.replace(/^http:/, "https:") + "&w=960&h=540&c=14";
+    if (img) img = img.replace(/^http:/, "https:");   // بدون w/h: بزرگ‌تر از اصل که بخواهی، بینگ دورش حاشیه‌ی سفید می‌گذارد
     img = img || encl?.["@url"] || arr(n["media:thumbnail"])[0]?.["@url"] ||
           arr(n["media:content"]).find(m => (m["@medium"] || "image") === "image" || /image/i.test(m["@type"] || ""))?.["@url"] ||
           ((html.match(/<img[^>]+src=["']([^"']+)/i) || [])[1]) || "";
@@ -281,8 +281,11 @@ function cleanArticle(html, base){
   walk(root);
   return blocks;
 }
-async function fetchArticle(item){
-  const page = await get(item.link, {ms:20000, tries:1});
+// viaReader: صفحه از راه r.jina.ai خوانده شود (برای سایت‌هایی که GitHub را راه نمی‌دهند یا ایرانی‌اند)
+async function fetchArticle(item, viaReader){
+  const page = viaReader
+    ? await get("https://r.jina.ai/" + item.link, {ms:45000, tries:1, headers:{"X-Return-Format":"html"}}).then(r => ({text:r.text, url:item.link}))
+    : await get(item.link, {ms:20000, tries:1});
   const { document } = parseHTML(page.text);
   const meta = (...names) => { for (const n of names){ const m = document.querySelector(`meta[property="${n}"],meta[name="${n}"]`); const v = m && m.getAttribute("content"); if (v) return v; } return ""; };
   let og = meta("og:image", "og:image:url", "twitter:image", "twitter:image:src");
@@ -493,24 +496,39 @@ for (const x of all){
     x.checked = true; continue;
   }
   // سایت‌های ایرانی از خارج باز نمی‌شوند؛ عکس و خلاصه‌ی بینگ کافی است
-  if (x.lang === "fa"){ if (x.img && /bing\.com\/th/.test(x.img)) x.img = x.img.replace(/&w=\d+&h=\d+/, "&w=960&h=540"); x.checked = true; continue; }
+  if (x.img && /bing\.com\/th/.test(x.img)) x.img = x.img.replace(/&(w|h|c)=\d+/g, "");
   const old = prevById.get(x.id);
+  // قبلاً امتحان شده و متن نگرفته: تا سه بار در اجراهای بعد دوباره امتحان می‌شود
+  if (old && old.checked && !old.full && (old.tries || 1) < 3){ x.tries = old.tries || 1; x.img = x.img || old.img; if (!x.summary && old.summary) x.summary = old.summary; fresh.push(x); continue; }
   if (old && old.checked){ x.img = x.img || old.img; x.full = old.full; x.checked = true; if (!x.summary && old.summary) x.summary = old.summary;
     if (old.full){ const a = await remoteJson("/data/a/" + x.id + ".json"); if (a) await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify(a)); else x.full = false; } }
   else fresh.push(x);
 }
 console.log(`items: ${all.length}, new to enrich: ${fresh.length}`);
 let enriched = 0;
+const useArticle = async (x, a) => {
+  if (!x.img || /bing\.com\/th/.test(x.img)) x.img = a.og || x.img;
+  if (!x.summary && a.desc) x.summary = clip(a.desc, 300);
+  if (a.blocks.length){ x.full = true; await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:a.url, blocks:a.blocks})); }
+};
+const readerQueue = [];
+const isIranian = u => /\.ir(\/|$)|gamefa\.com|vigiato\.net|digiato\.com|zoomit|zoomg/i.test(host(u) + "/");
 await pool(fresh.slice(0, ARTICLE_BUDGET), 8, async x => {
-  try {
-    const a = await fetchArticle(x);
-    if (!x.img || /bing\.com\/th/.test(x.img)) x.img = a.og || x.img;
-    if (!x.summary && a.desc) x.summary = clip(a.desc, 300);
-    if (a.blocks.length){ x.full = true; await fs.writeFile(path.join(OUT, "a", x.id + ".json"), JSON.stringify({id:x.id, url:a.url, blocks:a.blocks})); }
-    enriched++;
-  } catch {}
+  if (/youtu\.?be|t\.me\/|store\.steampowered\.com/i.test(x.link)){ x.checked = true; return; }
+  if (isIranian(x.link)){ readerQueue.push(x); x.checked = true; return; }
+  try { const a = await fetchArticle(x); await useArticle(x, a); if (a.blocks.length) enriched++; else readerQueue.push(x); }
+  catch { readerQueue.push(x); }
   x.checked = true;
 });
+// دومین راه: r.jina.ai (رایگان، حدود ۲۰ درخواست در دقیقه؛ آهسته و پشت‌سرهم)
+let viaReader = 0;
+const READER_BUDGET = 40;
+for (const x of readerQueue.slice(0, READER_BUDGET)){
+  try { const a = await fetchArticle(x, true); await useArticle(x, a); if (a.blocks.length) viaReader++; } catch {}
+  if (!x.full) x.tries = (x.tries || 0) + 1;
+  await sleep(3200);
+}
+console.log(`full text via reader service: ${viaReader}/${Math.min(readerQueue.length, READER_BUDGET)} (queue ${readerQueue.length})`);
 
 // هر خبر باید کاور داشته باشد: عکس خودش، وگرنه کاور علاقه‌مندی‌اش، وگرنه کنار گذاشته می‌شود
 for (const x of all){
